@@ -6,7 +6,6 @@
 
   let name = "";
   let greetMsg = "";
-  let sentMsg = "";
   var ws: WebSocket;
 
   async function greet() {
@@ -27,7 +26,7 @@
   //   sentMsg = await invoke("print_msg", { message });
   // }
 
-  async function send_hello() {
+  async function get_ingredients(upc: string) {
 
     await ws.send('Hello World!');
   }
