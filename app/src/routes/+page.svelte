@@ -9,6 +9,13 @@
   let sentMsg = "";
   var ws: WebSocket;
 
+  enum allergen_severity { //first one is 1, then rest automatically incremented
+    MILD = 1,
+    MODERATE,
+    SEVERE,
+    RESTRICTED
+  }
+
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     greetMsg = await invoke("greet", { name }); //backend function - this is typescript in the front end,
@@ -23,20 +30,13 @@
     });
   }
 
-  // async function print_msg(){
-  //   sentMsg = await invoke("print_msg", { message });
-  // }
-
-  async function send_hello() {
-
-await ws.send('Hello World!');
+    async function send_hello() {
+      await ws.send('Hello World!');
 }
+  async function get_ingredients(upc: string) {
 
-
-  // async function get_ingredients(upc: string) {
-
-  //   await ws.send('Hello World!');
-  // }
+    await ws.send('Hello World!');
+  }
 
   setup_socket();
 

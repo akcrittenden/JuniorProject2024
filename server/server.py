@@ -2,6 +2,8 @@ import asyncio
 import logging
 from websockets.asyncio.server import serve
 
+ingredients = "SALT, SUGAR, SPICES, SOY, WHEAT"
+
 logging.basicConfig(
     format="%(message)s",
     level=logging.DEBUG,
