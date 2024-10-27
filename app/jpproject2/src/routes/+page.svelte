@@ -1,6 +1,9 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
   import WebSocket from "@tauri-apps/plugin-websocket";
+  import { commands } from "./types";
+  import type { allergen_severity } from "./types";
+
   // when using `"withGlobalTauri": true`, you may use
   // const WebSocket = window.__TAURI__.websocket;
 
@@ -11,22 +14,20 @@
 
   let testing_UPC_code: "041570072561";
 
-  enum commands {
-    GET_INGREDIENTS = '1'
-  }
+  // enum commands {
+  //   GET_INGREDIENTS = '1'
+  // }
 
-  enum allergen_severity { //first one is 1, then rest automatically incremented
-    MILD = 1,
-    MODERATE,
-    SEVERE,
-    RESTRICTED,
-  }
+  // enum allergen_severity { //first one is 1, then rest automatically incremented
+  //   MILD = 1,
+  //   MODERATE,
+  //   SEVERE,
+  //   RESTRICTED,
+  // }
 
   let ingredient_and_severity: [string, allergen_severity];
 
-  function set_allergen_severity(){
-
-  }
+  function set_allergen_severity() {} //TO DO
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -42,27 +43,44 @@
     });
 
     async function send_hello() {
-    await ws.send("Hello World!");
+      await ws.send("Hello World!");
+    }
   }
-}
 
-  async function get_ingredients(upc: string) {
+  // async function get_ingredients(upc: string) {
+  //   ws = await WebSocket.connect("ws://127.0.0.1:8080");
+  //   let ret = "";
+  //   ws.addListener((msg) => {
+  //     console.log("Received Message:", msg);
+  //     if (typeof msg === "string") {
+  //       ret = msg; //receives
+  //     } else ret = "Either server isn't connected or something is broken.";
+  //   });
+
+  //   await ws.send(enums.commands.GET_INGREDIENTS + upc);
+  //   await ws.disconnect();
+  //   console.log(ret);
+  //   return ret; // front end displays
+  // }
+
+      let ret = "";
+  async function get_ingredients() {
     ws = await WebSocket.connect("ws://127.0.0.1:8080");
-    let ret = '';
     ws.addListener((msg) => {
       console.log("Received Message:", msg);
-      if (typeof msg === 'string'){
-        ret = msg; //receives
-      }
+      if (typeof msg.data === "string") {
+        ret = msg.data; //receives
+      } 
     });
 
-    await ws.send( commands.GET_INGREDIENTS + upc );
+    await ws.send(commands.GET_INGREDIENTS);
     await ws.disconnect();
     console.log(ret);
     return ret; // front end displays
   }
-  
+
   setup_socket();
+  get_ingredients();
 
 </script>
 
@@ -100,10 +118,12 @@
 
   <!-- TO DO: dropdown go here -->
 
-  <button on:click={() => get_ingredients( testing_UPC_code )}>
-    <h1>Finding Ingredients</h1>
+  <button on:click={() => get_ingredients()}>
+    <h1>Find Ingredients</h1>
   </button>
 
+  <!-- prints on screen! -->
+  <p>{ret}</p> 
 
 </div>
 
