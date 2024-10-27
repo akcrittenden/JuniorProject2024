@@ -4,15 +4,16 @@
   // when using `"withGlobalTauri": true`, you may use
   // const WebSocket = window.__TAURI__.websocket;
 
-  // let name = "";
-  // let greetMsg = "";
+  let name = "";
+  let greetMsg = "";
+  let sentMsg = "";
   var ws: WebSocket;
 
-  // async function greet() {
-  //   // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  //   greetMsg = await invoke("greet", { name }); //backend function - this is typescript in the front end,
-  //   // sending a string "greet" over websocket to backend of Tauri, so Tauri searches for the function named "greet"
-  // }
+  async function greet() {
+    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    greetMsg = await invoke("greet", { name }); //backend function - this is typescript in the front end,
+    // sending a string "greet" over websocket to backend of Tauri, so Tauri searches for the function named "greet"
+  }
 
   async function setup_socket() {
     ws = await WebSocket.connect('ws://127.0.0.1:8080');
@@ -26,10 +27,16 @@
   //   sentMsg = await invoke("print_msg", { message });
   // }
 
-  async function get_ingredients(upc: string) {
+  async function send_hello() {
 
-    await ws.send('Hello World!');
-  }
+await ws.send('Hello World!');
+}
+
+
+  // async function get_ingredients(upc: string) {
+
+  //   await ws.send('Hello World!');
+  // }
 
   setup_socket();
 
@@ -60,10 +67,11 @@
 
   <p>{greetMsg}</p>
 
-  <!-- <button on:click={send_hello}> 
+  <button on:click={send_hello}> 
     <h1>Send Hello!</h1>
   </button>
-</div> -->
+
+</div>
 
 <style>
 .logo.vite:hover {
