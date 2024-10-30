@@ -13,64 +13,22 @@
   var ws: WebSocket;
 
   let testing_UPC_code: "041570072561";
-
-  // enum commands {
-  //   GET_INGREDIENTS = '1'
-  // }
-
-  // enum allergen_severity { //first one is 1, then rest automatically incremented
-  //   MILD = 1,
-  //   MODERATE,
-  //   SEVERE,
-  //   RESTRICTED,
-  // }
+  let entered_UPC: "";
 
   let ingredient_and_severity: [string, allergen_severity];
 
   function set_allergen_severity() {} //TO DO
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    greetMsg = await invoke("greet", { name }); //backend function - this is typescript in the front end,
-    // sending a string "greet" over websocket to backend of Tauri, so Tauri searches for the function named "greet"
-  }
-
-  async function setup_socket() {
-    ws = await WebSocket.connect("ws://127.0.0.1:8080");
-
-    ws.addListener((msg) => {
-      console.log("Received Message:", msg); //receives
-    });
-
-    async function send_hello() {
-      await ws.send("Hello World!");
-    }
-  }
-
-  // async function get_ingredients(upc: string) {
-  //   ws = await WebSocket.connect("ws://127.0.0.1:8080");
-  //   let ret = "";
-  //   ws.addListener((msg) => {
-  //     console.log("Received Message:", msg);
-  //     if (typeof msg === "string") {
-  //       ret = msg; //receives
-  //     } else ret = "Either server isn't connected or something is broken.";
-  //   });
-
-  //   await ws.send(enums.commands.GET_INGREDIENTS + upc);
-  //   await ws.disconnect();
-  //   console.log(ret);
-  //   return ret; // front end displays
-  // }
-
-      let ret = "";
+  let ret = "";
   async function get_ingredients() {
     ws = await WebSocket.connect("ws://127.0.0.1:8080");
     ws.addListener((msg) => {
-      console.log("Received Message:", msg);
+      // listens for message back from server
+      console.log("Received Message:", msg); // it will print "Rec'd msg: blah" in console
       if (typeof msg.data === "string") {
+        //if the message back from server is a string, set it to a variable
         ret = msg.data; //receives
-      } 
+      }
     });
 
     await ws.send(commands.GET_INGREDIENTS);
@@ -79,7 +37,7 @@
     return ret; // front end displays
   }
 
-  setup_socket();
+ // setup_socket();
   get_ingredients();
 
 </script>
@@ -87,17 +45,14 @@
 <div class="container">
   <h1>Welcome to Tauri!</h1>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
+  <form class="row" on:submit|preventDefault={get_ingredients}>
+    <input
+      id="greet-input"
+      placeholder="Enter a UPC"
+      bind:value={entered_UPC}
+    />
+    <button type="submit">Submit</button>
+  </form>
 
   <!-- <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
 
@@ -123,8 +78,7 @@
   </button>
 
   <!-- prints on screen! -->
-  <p>{ret}</p> 
-
+  <p>{ret}</p>
 </div>
 
 <style>
