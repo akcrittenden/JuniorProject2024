@@ -1,0 +1,8 @@
+<slot />
+
+<style>
+  :global(h1) {
+    font-family: Arial, Helvetica, sans-serif;
+    color: cornflowerblue;
+  }
+</style>
