@@ -3,6 +3,7 @@
   import WebSocket from "@tauri-apps/plugin-websocket";
   import { commands } from "./types";
   import type { allergen_severity } from "./types";
+  import { dataDir } from "@tauri-apps/api/path";
 
   // when using `"withGlobalTauri": true`, you may use
   // const WebSocket = window.__TAURI__.websocket;
@@ -17,68 +18,78 @@
 
   let ingredient_and_severity: [string, allergen_severity];
 
-  function set_allergen_severity() {} //TO DO
-
-  let ret = "";
-  async function get_ingredients() {
-    ws = await WebSocket.connect("ws://127.0.0.1:8080");
+  const finalArray: string[] = [];
+  //function set_allergen_severity() {} //TO DO
+  async function get_ingredients(upc:string) {
+    ws = await WebSocket.connect("ws://10.220.8.180:8765");
     ws.addListener((msg) => {
-      // listens for message back from server
-      console.log("Received Message:", msg); // it will print "Rec'd msg: blah" in console
+      // listens for msg back from server
+      console.log("Received Message:", msg); // it will print "Rec'd message: blah" in console
       if (typeof msg.data === "string") {
         //if the message back from server is a string, set it to a variable
-        ret = msg.data; //receives
+        finalArray[0] = msg.data; //receive
+      }
+      else if (typeof msg === "object"){
+        finalArray[0] = Object.keys(msg)[0];
+        finalArray[1] = Object.keys(msg)[1];        
       }
     });
 
-    await ws.send(commands.GET_INGREDIENTS);
+    await ws.send(upc);
     await ws.disconnect();
-    console.log(ret);
-    return ret; // front end displays
+    console.log(finalArray[0] + ', ' + finalArray[1]);
+    return finalArray; // front end displays
   }
 
  // setup_socket();
-  get_ingredients();
+  get_ingredients('034000056750');
+
+  
 
 </script>
 
 <div class="container">
   <h1>Welcome to Tauri!</h1>
 
-  <form class="row" on:submit|preventDefault={get_ingredients}>
+  <!-- <form class="row" on:submit|preventDefault={get_ingredients}>
     <input
       id="greet-input"
       placeholder="Enter a UPC"
       bind:value={entered_UPC}
     />
     <button type="submit">Submit</button>
-  </form>
+  </form> -->
 
   <!-- <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" on:submit|preventDefault={greet}>
-    <input
-      id="greet-input"
-      placeholder="Enter a message..."
-      bind:value={name}
-    />
-    <button type="submit">Greet</button>
-  </form>
-
   <p>{greetMsg}</p> -->
 
   <!-- <button on:click={send_hello}>
     <h1>Send Hello!</h1>
   </button> -->
 
+<p>I'm allergic to soy and wheat. Let's see what I can eat!</p>
+
   <!-- TO DO: dropdown go here -->
 
-  <button on:click={() => get_ingredients()}>
+   <form class="row" on:submit={() => get_ingredients(TO-TO)}>
+   <label for="UPCs">Choose a UPC to check: </label>
+   <select name="UPCs" id="UPCs">
+    <option value="frenchFries">Frozen Seasoned French Fries</option>
+    <option value="soySauce">Soy Sauce</option>
+    <option value="glutenFreeCookie">Gluten-Free Cookie</option>
+   </select>
+  </form>
+
+  <!-- <button on:click={() => get_ingredients()}>
     <h1>Find Ingredients</h1>
-  </button>
+  </button> -->
 
   <!-- prints on screen! -->
-  <p>{ret}</p>
+  <p>{finalArray[0]}</p>
+  <p>{finalArray[1]}</p>
+
+
+
 </div>
 
 <style>

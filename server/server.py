@@ -18,9 +18,9 @@ return userlist.allergen.severity that contains salt?
 ingredients = "SALT, SUGAR, SPICES, SOY, WHEAT"
 
 local_database = {
-    "soyandwheat": ["SALT", "SUGAR", "SPICES", "SOY", "WHEAT"],
-    "justsoy": ["SALT, SOY, SUGAR, MILK"],
-    "noallergies": ["SALT, SUGAR, CHOCOLATE"],
+    "FrenchFries": ["SALT", "SUGAR", "SPICES", "SOY", "WHEAT"],
+    "soySauce": ["SALT, SOY, SUGAR, MILK"],
+    "GlutenFreeCookies": ["SALT, SUGAR, CHOCOLATE"],
 }
 
 user_list = [
@@ -39,7 +39,7 @@ def get_allergens(user_id: int) -> tuple[tuple[str, str]]:
     pass
 
 
-any([allergen[0] in local_database["soyandwheat"] for allergen in user_list])
+# any([allergen[0] in local_database["soyandwheat"] for allergen in user_list])
 
 logging.basicConfig(
     format="%(message)s",
