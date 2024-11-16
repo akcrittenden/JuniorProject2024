@@ -1,73 +1,96 @@
 import asyncio
-import logging
 from collections import namedtuple
 
-from websockets.asyncio.server import serve
+import websockets
+import requests
 
-# not quite a struct b/c no types or methods
-# can call like user_list[0].allergen
-allergen = namedtuple("allergen", ["allergen", "severity"])
-
-"""
-small testing database to search against -
-so we can do like ""SALT" in local_database['soyandwheat']" and
-it returns true or false
-TO DO - get severity pushed as well - can we do if "SALT" in local_database['soyandwheat'] == true, 
-return userlist.allergen.severity that contains salt?
-"""
-ingredients = "SALT, SUGAR, SPICES, SOY, WHEAT"
-
-local_database = {
-    "FrenchFries": ["SALT", "SUGAR", "SPICES", "SOY", "WHEAT"],
-    "soySauce": ["SALT, SOY, SUGAR, MILK"],
-    "GlutenFreeCookies": ["SALT, SUGAR, CHOCOLATE"],
-}
-
-user_list = [
-    allergen(allergen="WHEAT", severity="SEVERE"),
-    allergen(allergen="SOY", severity="MILD"),
-]  # ingredient allergic to, severity, so we can do like user_list[0].allergen
+api_key = 'DEMO_KEY'
 
 
-# get ingredients from UPC, return as string
-def get_ingredients(upc: int) -> list[str]:
-    pass
+# Search USDA Food Central Database with UPC key
+async def get_data(search_term):
+    # Define search endpoint and parameters
+    url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+
+    params = {
+        "api_key": api_key,
+        "query": search_term,
+        "dataType": "Branded",
+        "pageSize": 5,  # Number of results per page
+    }
+
+    try:
+        # Make a GET request to the API endpoint
+        response = requests.get(url, params=params)
+        print(response.url)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            #
+            return response.json()
+        else:
+            print('Error:', response.status_code)
+            return None
+
+    # Handle any network-related errors or exceptions
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
 
 
-# get user allergens
-def get_allergens(user_id: int) -> tuple[tuple[str, str]]:
-    pass
+# Receive incoming UPC key from client & send back description/ingredients
+async def websocket_connection(websocket):
+    try:
+        # Wait for a message from the client
+        search_term = str(await websocket.recv())
+        print(f"Received {search_term}")
+
+        # Perform the search in the USDA database
+        data = await get_data(search_term)
+        print_data(data)
+
+        # Combine ingredients and description into named tuple
+        description = str(data['foods'][0].get('description', 'No description found'))
+        ingredients = str(data['foods'][0].get('ingredients', 'No ingredients found'))
+
+        product = namedtuple('Product', ['description', 'ingredients'])
+        p = product(description, ingredients)
+
+        # Send named tuple back to client
+        await websocket.send(p)
+
+    except Exception as err:
+        print(f"Error: {err}")
+        await websocket.send("An error occurred while processing your request.")
 
 
-# any([allergen[0] in local_database["soyandwheat"] for allergen in user_list])
-
-logging.basicConfig(
-    format="%(message)s",
-    level=logging.DEBUG,
-)
-# async def echo(websocket):
-#     async for message in websocket:
-#         await websocket.send(message)
-
-
-async def server_handler(websocket):
-    async for message in websocket:
-        if message[0] == "1":
-            upc = message[1:]
-            # find upc in local database
-            # if not found, return some error (if "totalHits" == 0)
-            await websocket.send(
-                ingredients
-            )  # return object maybe? allergens if detected and their severity
+# Print formatted product data
+def print_data(data):
+    if data:
+        for food in data['foods']:
+            print(f"Description: {food['description']}")
+            print(f"Brand Name: {food['brandName']}")
+            print(f"FDC ID: {food['fdcId']}")
+            print(f"Data Type: {food['dataType']}")
+            print(f"Ingredients: {food['ingredients']}")
+            print("-" * 100)  # format_fun()
+    else:
+        print('Failed to fetch data from API.')
 
 
-# do as much as we can back here - for Alpha, do the string comparing here
+# Print listening message every 5 minutes to confirm server is running
+async def periodic_message():
+    while True:
+        print("Server is listening on ws://10.220.8.180:8765")
+        print("-" * 100)  # format_fun()
+        await asyncio.sleep(300)  # 300 seconds = 5 minutes
 
 
 async def main():
-    async with serve(server_handler, "127.0.0.1", 8080):
-        await asyncio.get_running_loop().create_future()  # run forever
+    # Start WebSocket server
+    async with websockets.serve(websocket_connection, "10.220.8.180", 8765):
+        await asyncio.gather(periodic_message())
+        await asyncio.Future()  # Run forever
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
