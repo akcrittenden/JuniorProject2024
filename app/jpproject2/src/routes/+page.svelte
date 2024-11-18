@@ -4,6 +4,9 @@
   import { commands } from "./types";
   import type { allergen_severity } from "./types";
   import { dataDir } from "@tauri-apps/api/path";
+  import { goto } from "$app/navigation";
+
+  //AMANDA'S STUFF AMANDA'S STUFF AMANDA'S STUFF AMANDA'S STUFF //
 
   // when using `"withGlobalTauri": true`, you may use
   // const WebSocket = window.__TAURI__.websocket;
@@ -49,29 +52,11 @@
 </script>
 
 <div class="container">
-  <h1>Welcome to Tauri!</h1>
 
-  <!-- <form class="row" on:submit|preventDefault={get_ingredients}>
-    <input
-      id="greet-input"
-      placeholder="Enter a UPC"
-      bind:value={entered_UPC}
-    />
-    <button type="submit">Submit</button>
-  </form> -->
-
-  <!-- <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-  <p>{greetMsg}</p> -->
-
-  <!-- <button on:click={send_hello}>
-    <h1>Send Hello!</h1>
-  </button> -->
-
-<p>I'm allergic to soy and wheat. Let's see what I can eat!</p>
 
   <!-- TO DO: dropdown go here -->
 
-   <form class="row" on:submit={() => get_ingredients(TO-TO)}>
+   <form class="row" on:submit={() => get_ingredients()}>
    <label for="UPCs">Choose a UPC to check: </label>
    <select name="UPCs" id="UPCs">
     <option value="frenchFries">Frozen Seasoned French Fries</option>
@@ -85,8 +70,10 @@
   </button> -->
 
   <!-- prints on screen! -->
-  <p>{finalArray[0]}</p>
-  <p>{finalArray[1]}</p>
+  <!-- <p>{finalArray[0]}</p>
+  <p>{finalArray[1]}</p> -->
+
+  <p>{finalArray}</p>
 
 
 

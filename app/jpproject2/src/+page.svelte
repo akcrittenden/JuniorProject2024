@@ -1,3 +1,5 @@
+<!-- FRONT PAGE -->
+
 <script>
   import h1 from "$lib/components/Button.svelte";
   import { goto } from "$app/navigation";
