@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { event } from "@tauri-apps/api";
   import WebSocket from "@tauri-apps/plugin-websocket";
 
   let upc = "";
@@ -14,7 +15,8 @@
   const finalArray: string[] = [];
   //function set_allergen_severity() {} //TO DO
   async function get_ingredients(upc: string) {
-    ws = await WebSocket.connect("ws://10.220.8.180:8765");
+   // ws = await WebSocket.connect("ws://10.220.8.180:8765");
+    ws = await WebSocket.connect("ws://127.0.0.1:8080")
     ws.addListener((msg) => {
       // listens for msg back from server
       console.log("Received Message:", msg); // it will print "Rec'd message: blah" in console
@@ -33,22 +35,36 @@
     console.log(finalArray[0] + ", " + finalArray[1]);
     return finalArray; // front end displays
   }
+
+// THIS SHOULD BE WORKING WTF 
+  const button = document.getElementById("button");
+  button?.addEventListener("click", handleClick);
+
+function handleClick(this: HTMLElement) {
+    console.log("Clicked!");
+
+}
+  
 </script>
+
+
 
 <br />
 <button on:click={() => goto("/")}>Back</button>
-<p>I'm allergic to soy and wheat. Let's see what I can eat!</p>
 <h1>Enter UPC Code</h1>
 
 <input bind:value={upc} placeholder="enter upc code" />
-<button type="submit" on:click={showUPC}>Enter</button>
+<button type="submit">Enter</button> 
+<!-- removed the on:click(showUPC) thing to test the event listener on lines 40-45 but it no worky :( -->
+
+<p>{finalArray}</p>
+
 
 <!-- Here we basically need to call get_ingredients() with the UPC the user
-entered in the input box (I think it would look something like 
-on:click={get_ingredients(upc from the box)}). Then display
+entered in the input box (need an event listener to use get_ingredients with
+a parameter). Then display
 <p>{finalArray}</p> to show the ingredients from the server. If
-We wanted to add multiple actions on click, we would need to use an
-event listener.
+
 
 TO DO: add error or nothing at all happen when user clicks Enter without
 entering UPC - AKC-->
