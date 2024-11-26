@@ -4,13 +4,13 @@ import socket
 import requests
 from datetime import datetime
 
-api_key = 'DEMO_KEY'
+api_key = "DEMO_KEY"
 
 
 # Search USDA Food Central Database for UPC key
 async def get_data(search_term):
     # Define search endpoint and parameters
-    url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+    url = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
     # Create search parameter dictionary
     params = {
@@ -55,7 +55,7 @@ async def websocket_connection(websocket):
         print_data(data)
 
         # Send the search result back to the client
-        ingredients = data['foods'][0].get('ingredients', 'No ingredients found')
+        ingredients = data["foods"][0].get("ingredients", "No ingredients found")
         await websocket.send(ingredients)
 
     # No product data returned from USDA database
@@ -68,7 +68,7 @@ async def websocket_connection(websocket):
 # Print formatted product data
 def print_data(data):
     if data:
-        for food in data['foods']:
+        for food in data["foods"]:
             print(f"Description: {food['description']}")
             print(f"Brand Name: {food['brandName']}")
             print(f"Data Type: {food['dataType']}")

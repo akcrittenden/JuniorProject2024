@@ -4,60 +4,67 @@
   import { goto } from "$app/navigation";
   import { event } from "@tauri-apps/api";
   import WebSocket from "@tauri-apps/plugin-websocket";
+  
 
-  let upc = "";
+//------------------------------------------
+// this stuff should work
 
-  function showUPC() {
-    console.log(upc);
+  async function showUPC(){
+    console.log(testing_UPC_code);
   }
+
   var ws: WebSocket;
 
-  const finalArray: string[] = [];
-  //function set_allergen_severity() {} //TO DO
-  async function get_ingredients(upc: string) {
-   // ws = await WebSocket.connect("ws://10.220.8.180:8765");
-    ws = await WebSocket.connect("ws://127.0.0.1:8080")
+  let testing_UPC_code: string = "070847022909";
+
+  let ret = "";
+  let ret2 = "";
+  async function get_ingredients() {
+    let upc = testing_UPC_code;
+    ws = await WebSocket.connect("ws://10.220.12.54:8765");
     ws.addListener((msg) => {
-      // listens for msg back from server
-      console.log("Received Message:", msg); // it will print "Rec'd message: blah" in console
+      console.log("Received Message:", msg);
       if (typeof msg.data === "string") {
-        //if the message back from server is a string, set it to a variable
-        finalArray[0] = msg.data; //receive
-      } else if (typeof msg === "object") {
-        finalArray[0] = Object.keys(msg)[0];
-        finalArray[1] = Object.keys(msg)[1]; //TO DO: this still just
-        // returns 'data' and 'type' literally - will look into how to fix - AKC
+        ret = msg.data; //receives
       } 
+      // else (typeof msg.data === obj){
+        // TO DO - figure out how to receive each piece of the object rec'd
+      // }
     });
 
     await ws.send(upc);
-    await ws.disconnect();
-    console.log(finalArray[0] + ", " + finalArray[1]);
-    return finalArray; // front end displays
-  }
+    //await ws.disconnect();
+    console.log(ret);
+    return ret; // front end displays
+  };
 
-// THIS SHOULD BE WORKING WTF 
-  const button = document.getElementById("button");
-  button?.addEventListener("click", handleClick);
+  //get_ingredients();
 
-function handleClick(this: HTMLElement) {
-    console.log("Clicked!");
-
-}
-  
 </script>
 
 
 
 <br />
-<button on:click={() => goto("/")}>Back</button>
-<h1>Enter UPC Code</h1>
+<button onclick={() => goto("/")}>Back</button>
+<!-- <h1>Enter UPC Code</h1> -->
+<!-- ------------------------------------------
+Should work: -->
 
-<input bind:value={upc} placeholder="enter upc code" />
-<button type="submit">Enter</button> 
-<!-- removed the on:click(showUPC) thing to test the event listener on lines 40-45 but it no worky :( -->
+<!-- <button onclick={() => get_ingredients()}>
+  <h2>Find Ingredients</h2>
+</button> -->
 
-<p>{finalArray}</p>
+<!-- prints on screen! -->
+
+
+<!-- -------------------------------------- -->
+
+<input bind:value={testing_UPC_code} placeholder="enter upc code" />
+<button type="submit" onclick={get_ingredients}>Enter</button> 
+
+
+<!-- <p>{finalArray}</p> -->
+<p>{ret}</p> 
 
 
 <!-- Here we basically need to call get_ingredients() with the UPC the user
