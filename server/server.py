@@ -88,7 +88,7 @@ async def periodic_message():
     while True:
         print(f"{get_timestamp()} - Server is listening")
         format_fun()
-        await asyncio.sleep(300)  # 300 seconds = 5 minutes
+        await asyncio.sleep(30)  # 300 seconds = 5 minutes
 
 
 def format_fun():

@@ -1,4 +1,4 @@
-<!-- //SCAN PAGE// -->
+<!-- //ENTER UPC PAGE// -->
 
 <script lang="ts">
   import { goto } from "$app/navigation";
@@ -18,10 +18,9 @@
   let testing_UPC_code: string = "070847022909";
 
   let ret = "";
-  let ret2 = "";
   async function get_ingredients() {
     let upc = testing_UPC_code;
-    ws = await WebSocket.connect("ws://10.220.12.54:8765");
+    ws = await WebSocket.connect("ws://192.168.0.124:8765");
     ws.addListener((msg) => {
       console.log("Received Message:", msg);
       if (typeof msg.data === "string") {
@@ -44,8 +43,7 @@
 
 
 
-<br />
-<button onclick={() => goto("/")}>Back</button>
+
 <!-- <h1>Enter UPC Code</h1> -->
 <!-- ------------------------------------------
 Should work: -->
@@ -59,12 +57,16 @@ Should work: -->
 
 <!-- -------------------------------------- -->
 
+<br />
+<button onclick={() => goto("/")}>Back</button>
+
 <input bind:value={testing_UPC_code} placeholder="enter upc code" />
 <button type="submit" onclick={get_ingredients}>Enter</button> 
 
+<p>{ret}</p> 
+
 
 <!-- <p>{finalArray}</p> -->
-<p>{ret}</p> 
 
 
 <!-- Here we basically need to call get_ingredients() with the UPC the user
