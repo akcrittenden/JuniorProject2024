@@ -1,11 +1,10 @@
 {
   "identifier": "mobile-capability",
+  "windows": ["main"],
   "platforms": [
     "android",
     "iOS"
   ],
-  "permissions": [
-    "barcode-scanner:default",
-    "barcode-scanner:default"
-  ]
+"permissions": ["barcode-scanner:allow-scan", "barcode-scanner:allow-cancel"]
+  
 }
