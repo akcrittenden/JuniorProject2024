@@ -7,11 +7,10 @@
   
 
 //------------------------------------------
-// this stuff should work
 
-  async function showUPC(){
-    console.log(testing_UPC_code);
-  }
+  // async function showUPC(){
+  //   console.log(testing_UPC_code);
+  // }
 
   var ws: WebSocket;
 
