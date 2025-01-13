@@ -4,10 +4,8 @@
   import { goto } from "$app/navigation";
   import { event } from "@tauri-apps/api";
   import WebSocket from "@tauri-apps/plugin-websocket";
-  import { preventDefault } from "svelte/legacy";
   
-  let value = '';
-  let submittedValue = null;
+
 //------------------------------------------
 // this stuff should work
 
