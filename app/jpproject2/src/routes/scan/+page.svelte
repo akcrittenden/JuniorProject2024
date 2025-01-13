@@ -4,8 +4,10 @@
   import { goto } from "$app/navigation";
   import { event } from "@tauri-apps/api";
   import WebSocket from "@tauri-apps/plugin-websocket";
+  import { preventDefault } from "svelte/legacy";
   
-
+  let value = '';
+  let submittedValue = null;
 //------------------------------------------
 // this stuff should work
 
@@ -42,26 +44,19 @@
 </script>
 
 
-
-
-<!-- <h1>Enter UPC Code</h1> -->
-<!-- ------------------------------------------
-Should work: -->
-
-<!-- <button onclick={() => get_ingredients()}>
-  <h2>Find Ingredients</h2>
-</button> -->
-
-<!-- prints on screen! -->
-
-
-<!-- -------------------------------------- -->
-
 <br />
 <button onclick={() => goto("/")}>Back</button>
 
-<input bind:value={testing_UPC_code} placeholder="enter upc code" />
-<button type="submit" onclick={get_ingredients}>Enter</button> 
+<!-- <input bind:value={testing_UPC_code} placeholder="enter upc code" />
+<button type="submit" onclick={get_ingredients} >Enter</button>  -->
+
+<form>
+  <label>
+    <input bind:value={testing_UPC_code} />
+  </label>
+
+  <button onclick={get_ingredients} >Enter</button>
+</form>
 
 <p>{ret}</p> 
 
