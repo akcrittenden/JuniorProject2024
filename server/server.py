@@ -1,4 +1,6 @@
 import asyncio
+from collections import namedtuple
+
 import websockets
 import socket
 import requests
@@ -48,15 +50,27 @@ async def websocket_connection(websocket):
     try:
         # Wait for a message from the client
         search_term = str(await websocket.recv())
-        print(f"{get_timestamp()} - Received {search_term}")
+        if search_term == "":
+            print(f"UPC empty")
+            await websocket.send("Please enter a search term")
+        else:
+            print(f"{get_timestamp()} - Received {search_term}")
+            # Search USDA database and print returned data
+            data = await get_data(search_term)
+            print_data(data)
+            # Send the search result back to the client
+            # ingredients = data["foods"][0].get("ingredients", "No ingredients found")
+            description = str(
+                data["foods"][0].get("description", "No description found")
+            )
+            ingredients = str(
+                data["foods"][0].get("ingredients", "No ingredients found")
+            )
+            product = namedtuple("Product", ["description", "ingredients"])
+            p = product(description, ingredients)
 
-        # Search USDA database and print returned data
-        data = await get_data(search_term)
-        print_data(data)
-
-        # Send the search result back to the client
-        ingredients = data["foods"][0].get("ingredients", "No ingredients found")
-        await websocket.send(ingredients)
+            # await websocket.send(ingredients)
+            await websocket.send(p)
 
     # No product data returned from USDA database
     except Exception as e:
