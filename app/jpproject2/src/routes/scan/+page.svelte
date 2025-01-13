@@ -39,22 +39,19 @@
     return ret; // front end displays
   };
 
-  //get_ingredients();
-
 </script>
-
 
 <br />
 <button onclick={() => goto("/")}>Back</button>
 
 <!-- <input bind:value={testing_UPC_code} placeholder="enter upc code" />
 <button type="submit" onclick={get_ingredients} >Enter</button>  -->
+<br><br />
 
 <form>
   <label>
     <input bind:value={testing_UPC_code} />
   </label>
-
   <button onclick={get_ingredients} >Enter</button>
 </form>
 
