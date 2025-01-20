@@ -5,6 +5,8 @@ import websockets
 import socket
 import requests
 from datetime import datetime
+import json
+import gzip
 
 api_key = "DEMO_KEY"
 
@@ -50,27 +52,32 @@ async def websocket_connection(websocket):
     try:
         # Wait for a message from the client
         search_term = str(await websocket.recv())
+
         if search_term == "":
             print(f"UPC empty")
             await websocket.send("Please enter a search term")
         else:
             print(f"{get_timestamp()} - Received {search_term}")
+
             # Search USDA database and print returned data
             data = await get_data(search_term)
             print_data(data)
-            # Send the search result back to the client
-            # ingredients = data["foods"][0].get("ingredients", "No ingredients found")
-            description = str(
-                data["foods"][0].get("description", "No description found")
-            )
-            ingredients = str(
-                data["foods"][0].get("ingredients", "No ingredients found")
-            )
-            product = namedtuple("Product", ["description", "ingredients"])
-            p = product(description, ingredients)
 
-            # await websocket.send(ingredients)
-            await websocket.send(p)
+            # Send the search results back to the client STRING FORM
+            ingredients = str(data["foods"][0].get("ingredients", "No ingredients found"))
+            await websocket.send(ingredients)
+
+            '''
+            # Send the search results back to the client JSON FORM
+            new_data = {
+                "brandName": data["foods"][0].get("brandName", "No brand name found"),
+                "brandOwner": data["foods"][0].get("brandOwner", "No brand owner found"),
+                "foodCategory": data["foods"][0].get("foodCategory", "No category found"),
+                "ingredients": data["foods"][0].get("ingredients", "No ingredients found")
+            }
+            await websocket.send(json.dumps(new_data))
+            '''
+            
 
     # No product data returned from USDA database
     except Exception as e:
@@ -92,7 +99,7 @@ def print_data(data):
         print(f"{get_timestamp()} - Failed to fetch data from API")
 
 
-# Generate formatted timestamp
+# Formatted timestamp
 def get_timestamp():
     return datetime.now().strftime("%H:%M:%S")
 
@@ -102,7 +109,7 @@ async def periodic_message():
     while True:
         print(f"{get_timestamp()} - Server is listening")
         format_fun()
-        await asyncio.sleep(30)  # 300 seconds = 5 minutes
+        await asyncio.sleep(300)  # 300 seconds = 5 minutes
 
 
 def format_fun():
@@ -110,15 +117,14 @@ def format_fun():
 
 
 async def main():
-    # Get local IP address and set port
     hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    port = 8765
+    host = "0.0.0.0"    # Listen on all network interfaces
+    port = 443          # WSS port
 
     # Start WebSocket server
-    print(f"{get_timestamp()} - Starting server on {local_ip}:{port}")
+    print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
 
-    async with websockets.serve(websocket_connection, local_ip, port):
+    async with websockets.serve(websocket_connection, host, port):
         await asyncio.gather(periodic_message())
         await asyncio.Future()  # Run forever
 
