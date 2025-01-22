@@ -1,8 +1,3 @@
-<slot />
+<!-- Global <style> page, ignore this until spring term -->
 
-<style>
-  :global(h1) {
-    font-family: Arial, Helvetica, sans-serif;
-    color: cornflowerblue;
-  }
-</style>
+<slot />
