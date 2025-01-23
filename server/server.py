@@ -63,21 +63,29 @@ async def websocket_connection(websocket):
             data = await get_data(search_term)
             print_data(data)
 
+            """
             # Send the search results back to the client STRING FORM
             ingredients = str(data["foods"][0].get("ingredients", "No ingredients found"))
             await websocket.send(ingredients)
+            """
 
-            '''
             # Send the search results back to the client JSON FORM
             new_data = {
+                "description": data["foods"][0].get(
+                    "description", "No description found"
+                ),
                 "brandName": data["foods"][0].get("brandName", "No brand name found"),
-                "brandOwner": data["foods"][0].get("brandOwner", "No brand owner found"),
-                "foodCategory": data["foods"][0].get("foodCategory", "No category found"),
-                "ingredients": data["foods"][0].get("ingredients", "No ingredients found")
+                "brandOwner": data["foods"][0].get(
+                    "brandOwner", "No brand owner found"
+                ),
+                "foodCategory": data["foods"][0].get(
+                    "foodCategory", "No category found"
+                ),
+                "ingredients": data["foods"][0].get(
+                    "ingredients", "No ingredients found"
+                ),
             }
             await websocket.send(json.dumps(new_data))
-            '''
-            
 
     # No product data returned from USDA database
     except Exception as e:
@@ -118,13 +126,24 @@ def format_fun():
 
 async def main():
     hostname = socket.gethostname()
-    host = "0.0.0.0"    # Listen on all network interfaces
-    port = 443          # WSS port
+    local_ip = socket.gethostbyname(hostname)
+    port = 8765
 
     # Start WebSocket server
-    print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
+    print(f"{get_timestamp()} - Starting server on {local_ip}:{port}")
 
-    async with websockets.serve(websocket_connection, host, port):
+    async with websockets.serve(websocket_connection, local_ip, port):
+
+        # ----------------- BELOW IS FOR TED'S SERVER--------------------------
+        # host = "0.0.0.0"    # Listen on all network interfaces
+        # port = 443          # WSS port
+        #
+        # # Start WebSocket server
+        # print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
+        #
+        # async with websockets.serve(websocket_connection, host, port):
+        # ------------------ABOVE IS FOR TED'S SERVER__________________________
+
         await asyncio.gather(periodic_message())
         await asyncio.Future()  # Run forever
 

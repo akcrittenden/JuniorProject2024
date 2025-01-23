@@ -2,7 +2,9 @@
 
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { json } from "@sveltejs/kit";
   import { event } from "@tauri-apps/api";
+  import { dataDir } from "@tauri-apps/api/path";
   import WebSocket from "@tauri-apps/plugin-websocket";
   
 
@@ -15,28 +17,35 @@
   var ws: WebSocket;
 
   let testing_UPC_code: string = "070847022909";
+  let jsonDump: object = {description: ""};
 
-  let ret = "";
+  let returnedIngredients = "";
   async function get_ingredients() {
     let upc = testing_UPC_code;
+   //  ws = await WebSocket.connect("ws://allerscan.tplinkdns.com:443");
     ws = await WebSocket.connect("ws://192.168.0.124:8765");
     ws.addListener((msg) => {
       console.log("Received Message:", msg);
       if (typeof msg.data === "string") {
-        ret = msg.data; //receives
+        returnedIngredients = msg.data; //receives the ingredients and description as a one string
+        console.log("Received string");
       } 
-      // else (typeof msg.data === obj){
-        // TO DO - figure out how to receive each piece of the object rec'd
-      // }
+      else {
+        jsonDump = JSON.parse(returnedIngredients);
+        console.log(jsonDump);
+        console.log(jsonDump.description)
+        
+      }
     });
 
     await ws.send(upc);
-    //await ws.disconnect();
-    console.log(ret);
-    return ret; // front end displays
+    //await ws.disconnect(); // maybe make this on a timer? if not called in 30 seconds or something disconnect
+    console.log(returnedIngredients);
+    return returnedIngredients; // front end displays
   };
 
 </script>
+
 
 <br />
 <button onclick={() => goto("/")}>Back</button>
@@ -52,7 +61,16 @@
   <button onclick={get_ingredients} >Enter</button>
 </form>
 
-<p>{ret}</p> 
+<p></p>
+Food Item:
+{jsonDump.description} 
+<p></p>
+Brand:
+{jsonDump.brandName}
+<p></p>
+Ingredients:
+{jsonDump.ingredients}
+
 
 
 <!-- <p>{finalArray}</p> -->
@@ -61,9 +79,5 @@
 <!-- Here we basically need to call get_ingredients() with the UPC the user
 entered in the input box (need an event listener to use get_ingredients with
 a parameter). Then display
-<p>{finalArray}</p> to show the ingredients from the server. If
-
-
-TO DO: add error or nothing at all happen when user clicks Enter without
-entering UPC - AKC-->
+<p>{finalArray}</p> to show the ingredients from the server.-->
 
