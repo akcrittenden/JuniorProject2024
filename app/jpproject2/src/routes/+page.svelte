@@ -4,7 +4,7 @@
   import { goto } from "$app/navigation";
 </script>
 
-<h1>Aller-Scan</h1>
+<h1>FoodLens</h1>
 
 <button onclick={() => goto("/dietary-profile")}>Dietary Profile</button>
 <br /><button onclick={() => goto("/scan")}>Enter UPC</button>
