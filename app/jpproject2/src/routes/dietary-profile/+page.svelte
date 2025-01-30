@@ -1,21 +1,6 @@
 <script>
-  import { writable } from 'svelte/store';
+  import { allergen, severity, allergens, addAllergen } from '../../stores/allergens.js'; //Imports store file
   import { goto } from '$app/navigation';
-
-  export const allergen = writable("");
-  export const severity = writable("mild");
-  export const allergens = writable([]);
-
-  // Stores allergens
-  export function addAllergen(allergen, severity) {
-    if(allergen.trim() === "") {
-      alert("Please enter allergen.");
-      return;
-    }
-    allergens.update(currentAllergens => {
-      return [...currentAllergens, { allergen, severity }];
-    });
-  }
 </script>
 
 <!-- Back button -->
