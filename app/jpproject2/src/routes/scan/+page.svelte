@@ -6,7 +6,7 @@
   import { event } from "@tauri-apps/api";
   import { dataDir } from "@tauri-apps/api/path";
   import WebSocket from "@tauri-apps/plugin-websocket";
-  
+  import { allergen, severity, allergens, addAllergen } from '../../stores/allergens.js'; //import allergens from store
 
 //------------------------------------------
 
@@ -54,6 +54,22 @@
 <button type="submit" onclick={get_ingredients} >Enter</button>  -->
 <br><br />
 
+<h1>Enter UPC:</h1>
+
+<!-- Ignore <style> for now, just playing around with it as I learn -->
+  <style>
+    p {
+        color: black;
+    }
+  
+    button {
+        background-color: rebeccapurple;
+        color: white;
+        border: none;
+        padding: 10px;
+    }
+  </style>
+
 <form>
   <label>
     <input bind:value={testing_UPC_code} />
@@ -71,6 +87,13 @@ Brand:
 Ingredients:
 {jsonDump.ingredients}
 
+<!-- Temporary for testing: Prints allergens/severity to screen -->
+<p> Stored Allergens TEST: </p>
+<p>
+  {#each $allergens as { allergen, severity }}
+      {allergen} - {severity}<br>
+  {/each}
+</p>
 
 
 <!-- <p>{finalArray}</p> -->
