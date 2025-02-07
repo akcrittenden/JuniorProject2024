@@ -7,6 +7,7 @@
   import { dataDir } from "@tauri-apps/api/path";
   import WebSocket from "@tauri-apps/plugin-websocket";
   import { allergen, severity, allergens, addAllergen } from '../../stores/allergens.js'; //import allergens from store
+  import { onMount } from 'svelte';
 
 //------------------------------------------
 
@@ -23,7 +24,7 @@
   async function get_ingredients() {
     let upc = testing_UPC_code;
    //  ws = await WebSocket.connect("ws://allerscan.tplinkdns.com:443");
-    ws = await WebSocket.connect("ws://192.168.0.124:8765");
+    ws = await WebSocket.connect("ws://10.220.12.72:8765");
     ws.addListener((msg) => {
       console.log("Received Message:", msg);
       if (typeof msg.data === "string") {
@@ -43,6 +44,18 @@
     console.log(returnedIngredients);
     return returnedIngredients; // front end displays
   };
+
+  // Sends allergens to server on navigation to scan page
+  onMount(async () => {
+        ws = await WebSocket.connect("ws://10.220.12.72:8765");
+    await ws.send(JSON.stringify({ type: "allergens", payload: $allergens }));
+    console.log("Allergens sent to server.");
+    });
+// TO DO: This sends a payload of allergens to the server when this screen is entered, 
+// but the server doesn't know what to do with it. We'll have to figure out how to
+// tell the server what we're sending - would be as easy as appending a 1 or 0
+// to the beginning of some string and on the server doing a if/else thing
+// depending on what it gets
 
 </script>
 
