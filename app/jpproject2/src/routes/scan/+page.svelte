@@ -24,7 +24,7 @@
   async function get_ingredients() {
     let upc = testing_UPC_code;
    //  ws = await WebSocket.connect("ws://allerscan.tplinkdns.com:443");
-    ws = await WebSocket.connect("ws://10.220.12.72:8765");
+    ws = await WebSocket.connect("ws://192.168.0.124:8765");
     ws.addListener((msg) => {
       console.log("Received Message:", msg);
       if (typeof msg.data === "string") {
