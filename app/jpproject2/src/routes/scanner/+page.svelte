@@ -29,7 +29,17 @@ const getCameraPreview = async () => {
   <br />
   <button onclick={getCameraPreview}>Start Camera</button>
 </div>
+<div>
+  <video id="video" width="300" height="300" autoplay></video>
+  <br />
+  <button onclick={getCameraPreview}>Start Camera</button>
+</div>
 
+<style>
+  body {
+    background: transparent;
+  }
+</style>
 <style>
   body {
     background: transparent;
