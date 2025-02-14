@@ -50,8 +50,7 @@ const getCameraPreview = async () => {
   <button onclick={getCameraPreview}>Start Camera</button>
   <br />
   <button onclick={handleScan}>Scan</button>
-  <br />
-  <div id="result">{scanresult}</div>
+
 </div>
 
 
