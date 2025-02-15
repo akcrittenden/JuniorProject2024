@@ -17,3 +17,10 @@ export function addAllergen(allergen, severity) {
     { allergen, severity }
   ]);
 }
+
+// Function to remove allergens
+export function removeAllergen(banish_allergen) {
+  allergens.update((currentAllergens) =>
+    currentAllergens.filter(item => item !== banish_allergen)
+  );
+}
