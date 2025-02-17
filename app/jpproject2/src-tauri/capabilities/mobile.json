@@ -8,10 +8,6 @@
     "iOS"
   ],
   "permissions": [
-    "barcode-scanner:allow-scan",
-    "barcode-scanner:allow-cancel",
-    "barcode-scanner:allow-permissions",
-    "barcode-scanner:request-permissions",
-    "barcode-scanner:check-permissions"
+
   ]
 }
