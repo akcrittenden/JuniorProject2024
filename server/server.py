@@ -1,6 +1,5 @@
 import asyncio
 from collections import namedtuple
-
 import websockets
 import socket
 import requests
@@ -47,45 +46,53 @@ async def get_data(search_term):
         return None
 
 
-# Receive incoming UPC key from client & send back description/ingredients
-async def websocket_connection(websocket):
+# WebSocket handler to process UPC and allergens in a single request
+async def websocket_handler(websocket):
     try:
-        # Wait for a message from the client
-        search_term = str(await websocket.recv())
+        # Receive JSON payload from client
+        message = await websocket.recv()
+        
+        try:
+            data = json.loads(message)  # Expecting a JSON object
+            upc = data.get("upc")
+            allergens = data.get("allergens", [])
 
-        if search_term == "":
-            print(f"UPC empty")
-            await websocket.send("Please enter a search term")
-        else:
-            print(f"{get_timestamp()} - Received {search_term}")
+            if not upc or not isinstance(allergens, list):
+                raise ValueError("Invalid input format")
+        
+        except (json.JSONDecodeError, ValueError):
+            await websocket.send(json.dumps({"error": "Invalid format. Send a JSON object with 'upc' and 'allergens' list."}))
+            return
 
-            # Search USDA database and print returned data
-            data = await get_data(search_term)
-            print_data(data)
+        print(f"{get_timestamp()} - Received UPC: {upc}")
+        print(f"{get_timestamp()} - Received Allergens: {allergens}")
 
-            """
-            # Send the search results back to the client STRING FORM
-            ingredients = str(data["foods"][0].get("ingredients", "No ingredients found"))
-            await websocket.send(ingredients)
-            """
+        # Fetch product data
+        food_data = await get_data(upc)
 
-            # Send the search results back to the client JSON FORM
-            new_data = {
-                "description": data["foods"][0].get(
-                    "description", "No description found"
-                ),
-                "brandName": data["foods"][0].get("brandName", "No brand name found"),
-                "brandOwner": data["foods"][0].get(
-                    "brandOwner", "No brand owner found"
-                ),
-                "foodCategory": data["foods"][0].get(
-                    "foodCategory", "No category found"
-                ),
-                "ingredients": data["foods"][0].get(
-                    "ingredients", "No ingredients found"
-                ),
+        if food_data and "foods" in food_data and len(food_data["foods"]) > 0:
+            food = food_data["foods"][0]
+            ingredients = food.get("ingredients", "No ingredients found").lower()
+
+            # Compare allergens with ingredients
+            matches = [allergen for allergen in allergens if allergen.lower() in ingredients]
+
+            # Construct response
+            response_data = {
+                "description": food.get("description", "No description found"),
+                "brandName": food.get("brandName", "No brand name found"),
+                "ingredients": ingredients,
+                "matching_allergens": matches
             }
-            await websocket.send(json.dumps(new_data))
+
+            await websocket.send(json.dumps(response_data))
+
+        else:
+            await websocket.send(json.dumps({"error": "Product not found"}))
+
+    except Exception as e:
+        print(f"{get_timestamp()} - Error: {e}")
+        await websocket.send(json.dumps({"error": "Server error"}))
 
     # No product data returned from USDA database
     except Exception as e:
@@ -125,25 +132,13 @@ def format_fun():
 
 
 async def main():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    port = 8765
+    host = "0.0.0.0"    # Listen on all network interfaces
+    port = 8765         # WSS port
 
     # Start WebSocket server
-    print(f"{get_timestamp()} - Starting server on {local_ip}:{port}")
+    print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
 
-    async with websockets.serve(websocket_connection, local_ip, port):
-
-        # ----------------- BELOW IS FOR TED'S SERVER--------------------------
-        # host = "0.0.0.0"    # Listen on all network interfaces
-        # port = 443          # WSS port
-        #
-        # # Start WebSocket server
-        # print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
-        #
-        # async with websockets.serve(websocket_connection, host, port):
-        # ------------------ABOVE IS FOR TED'S SERVER__________________________
-
+    async with websockets.serve(websocket_handler, host, port):
         await asyncio.gather(periodic_message())
         await asyncio.Future()  # Run forever
 
