@@ -1,4 +1,6 @@
 import asyncio
+import sqlite3
+import os
 from collections import namedtuple
 import websockets
 import socket
@@ -8,6 +10,33 @@ import json
 import gzip
 
 api_key = "DEMO_KEY"
+db_filename = "branded_foods.db"
+
+# Initialize the SQLite database
+def initialize_database():
+    """Creates the database and table if they don't exist, and prints status messages."""
+    
+    db_exists = os.path.exists(db_filename)  # Check if database file already exists
+
+    conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
+
+    if db_exists:
+        print(f"{get_timestamp()} - Connected to existing database.")
+    else:
+        print(f"{get_timestamp()} - Database created successfully.")
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS FoodProducts (
+            upc_code TEXT PRIMARY KEY,
+            brand_name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            ingredients TEXT NOT NULL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
 
 
 # Search USDA Food Central Database for UPC key
@@ -66,6 +95,8 @@ async def websocket_handler(websocket):
 
         print(f"{get_timestamp()} - Received UPC: {upc}")
         print(f"{get_timestamp()} - Received Allergens: {allergens}")
+
+        
 
         # Fetch product data
         food_data = await get_data(upc)
@@ -127,6 +158,7 @@ async def periodic_message():
         await asyncio.sleep(300)  # 300 seconds = 5 minutes
 
 
+# Print a line of dashes for formatting
 def format_fun():
     print("-" * 100)
 
@@ -134,6 +166,9 @@ def format_fun():
 async def main():
     host = "0.0.0.0"    # Listen on all network interfaces
     port = 8765         # WSS port
+
+    # Initialize the database before starting the server
+    initialize_database()
 
     # Start WebSocket server
     print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
