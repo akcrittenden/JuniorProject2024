@@ -35,7 +35,6 @@
         jsonDump = JSON.parse(returnedIngredients);
         console.log(jsonDump);
         console.log(jsonDump.description)
-        
       }
     });
 
