@@ -2,11 +2,9 @@ import asyncio
 import sqlite3
 import os
 import websockets
-import socket
 import requests
 from datetime import datetime
 import json
-import gzip
 
 api_key = "DEMO_KEY"
 db_filename = "branded_foods.db"
@@ -50,9 +48,9 @@ def fetch_from_db(upc_code):
 
     if product:
         return {
-            "brand_name": product[0],
-            "description": product[1],
-            "ingredients": product[2]
+            "brand_name": product[1],
+            "description": product[2],
+            "ingredients": product[3]
         }
     return None  # No record found
 
