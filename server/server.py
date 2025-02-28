@@ -1,47 +1,64 @@
 import asyncio
 import sqlite3
 import os
-from collections import namedtuple
 import websockets
-import socket
 import requests
 from datetime import datetime
 import json
-import gzip
 
 api_key = "DEMO_KEY"
 db_filename = "branded_foods.db"
 
+
 # Initialize the SQLite database
 def initialize_database():
-    """Creates the database and table if they don't exist, and prints status messages."""
-    
-    db_exists = os.path.exists(db_filename)  # Check if database file already exists
+    # Creates the database and table if they don't exist, and prints status messages.
 
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
-    if db_exists:
+    # Check if database file already exists
+    if os.path.exists(db_filename):
         print(f"{get_timestamp()} - Connected to existing database.")
     else:
-        print(f"{get_timestamp()} - Database created successfully.")
-
-    cursor.execute("""
+        cursor.execute("""
         CREATE TABLE IF NOT EXISTS FoodProducts (
             upc_code TEXT PRIMARY KEY,
             brand_name TEXT NOT NULL,
             description TEXT NOT NULL,
             ingredients TEXT NOT NULL
         )
-    """)
+        """)
+
+        print(f"{get_timestamp()} - Database created successfully.")
 
     conn.commit()
     conn.close()
 
 
+def fetch_from_db(upc_code):
+    # Retrieve product details from the database by UPC code
+
+    conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM FoodProducts WHERE upc_code = ?", (upc_code,))
+    product = cursor.fetchone()  # Fetch one record
+
+    conn.close()
+
+    if product:
+        return {
+            "brand_name": product[1],
+            "description": product[2],
+            "ingredients": product[3]
+        }
+    return None  # No record found
+
+
 # Search USDA Food Central Database for UPC key
-async def get_data(search_term):
-    # Define search endpoint and parameters
+async def fetch_from_usda(search_term):
+    # Define search endpoint
     url = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
     # Create search parameter dictionary
@@ -49,7 +66,7 @@ async def get_data(search_term):
         "api_key": api_key,
         "query": search_term,
         "dataType": "Branded",
-        "pageSize": 5,  # Number of results per page
+        "pageSize": 1,  # Number of results per page
     }
 
     try:
@@ -75,12 +92,32 @@ async def get_data(search_term):
         return None
 
 
+# Store a new product in the database
+def add_to_db(upc_code, brand_name, description, ingredients):
+    conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO FoodProducts (upc_code, brand_name, description, ingredients)
+            VALUES (?, ?, ?, ?)
+        """, (upc_code, brand_name, description, ingredients))
+
+        conn.commit()
+        print(f"{get_timestamp()} - Product added to database: {upc_code}")
+
+    except sqlite3.IntegrityError:
+        print(f"{get_timestamp()} - UPC {upc_code} already exists in database.")
+    finally:
+        conn.close()
+
+
 # WebSocket handler to process UPC and allergens in a single request
 async def websocket_handler(websocket):
     try:
         # Receive JSON payload from client
         message = await websocket.recv()
-        
+
         try:
             data = json.loads(message)  # Expecting a JSON object
             upc = data.get("upc")
@@ -88,61 +125,49 @@ async def websocket_handler(websocket):
 
             if not upc or not isinstance(allergens, list):
                 raise ValueError("Invalid input format")
-        
+
         except (json.JSONDecodeError, ValueError):
-            await websocket.send(json.dumps({"error": "Invalid format. Send a JSON object with 'upc' and 'allergens' list."}))
+            await websocket.send(
+                json.dumps({"error": "Invalid format. Send a JSON object with 'upc' and 'allergens' list."}))
             return
 
         print(f"{get_timestamp()} - Received UPC: {upc}")
         print(f"{get_timestamp()} - Received Allergens: {allergens}")
 
-        
+        # Check if the product exists in branded_foods.db
+        product = fetch_from_db(upc)
 
-        # Fetch product data
-        food_data = await get_data(upc)
+        if product:
+            print(f"{get_timestamp()} - Found UPC {upc} in {db_filename}.")
+        else:
+            print(f"{get_timestamp()} - UPC {upc} not found in {db_filename}. Fetching from USDA...")
 
-        if food_data and "foods" in food_data and len(food_data["foods"]) > 0:
-            food = food_data["foods"][0]
-            ingredients = food.get("ingredients", "No ingredients found").lower()
+            # Fetch data from USDA if not found
+            food_data = await fetch_from_usda(upc)
 
-            # Compare allergens with ingredients
+            if food_data and "foods" in food_data and len(food_data["foods"]) > 0:
+                food = food_data["foods"][0]
+                description = food.get("description", "No description found")
+                brand_name = food.get("brandName", "No brand name found")
+                ingredients = food.get("ingredients", "No ingredients found")
+
+                # Store fetched data in database
+                add_to_db(upc, brand_name, description, ingredients)
+
+            else:
+                await websocket.send(json.dumps({"error": "Product not found"}))
+                return
+
+            # Parse ingredients into a list and compare allergens
+            ingredients = [ingredient.strip().lower() for ingredient in ingredients.split(",")]
             matches = [allergen for allergen in allergens if allergen.lower() in ingredients]
 
-            # Construct response
-            response_data = {
-                "description": food.get("description", "No description found"),
-                "brandName": food.get("brandName", "No brand name found"),
-                "ingredients": ingredients,
-                "matching_allergens": matches
-            }
-
-            await websocket.send(json.dumps(response_data))
-
-        else:
-            await websocket.send(json.dumps({"error": "Product not found"}))
+            # Send list of matches to the client
+            await websocket.send(matches)
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
         await websocket.send(json.dumps({"error": "Server error"}))
-
-    # No product data returned from USDA database
-    except Exception as e:
-        print(f"{get_timestamp()} - Error: {e}")
-        format_fun()
-        await websocket.send("Product Not Found")
-
-
-# Print formatted product data
-def print_data(data):
-    if data:
-        for food in data["foods"]:
-            print(f"Description: {food['description']}")
-            print(f"Brand Name: {food['brandName']}")
-            print(f"Data Type: {food['dataType']}")
-            print(f"Ingredients: {food['ingredients']}")
-            format_fun()
-    else:
-        print(f"{get_timestamp()} - Failed to fetch data from API")
 
 
 # Formatted timestamp
@@ -164,8 +189,8 @@ def format_fun():
 
 
 async def main():
-    host = "0.0.0.0"    # Listen on all network interfaces
-    port = 8765         # WSS port
+    host = "0.0.0.0"  # Listen on all network interfaces
+    port = 8765
 
     # Initialize the database before starting the server
     initialize_database()
