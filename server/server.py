@@ -93,15 +93,15 @@ async def fetch_from_usda(search_term):
 
 
 # Store a new product in the database
-def add_to_db(upc_code, brand_name, description, ingredients_list):
+def add_to_db(upc_code, brand_name, description, ingredients):
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
     try:
         cursor.execute("""
-            INSERT INTO FoodProducts (upc_code, brand_name, description, ingredients_list)
+            INSERT INTO FoodProducts (upc_code, brand_name, description, ingredients)
             VALUES (?, ?, ?, ?)
-        """, (upc_code, brand_name, description, ingredients_list))
+        """, (upc_code, brand_name, description, ingredients))
 
         conn.commit()
         print(f"{get_timestamp()} - Product added to database: {upc_code}")
@@ -159,8 +159,8 @@ async def websocket_handler(websocket):
                 return
 
             # Parse ingredients into a list and compare allergens
-            ingredients_list = [ingredient.strip().lower() for ingredient in ingredients.split(",")]
-            matches = [allergen for allergen in allergens if allergen.lower() in ingredients_list]
+            ingredients = [ingredient.strip().lower() for ingredient in ingredients.split(",")]
+            matches = [allergen for allergen in allergens if allergen.lower() in ingredients]
 
             # Send list of matches to the client
             await websocket.send(matches)
