@@ -150,20 +150,25 @@ async def websocket_handler(websocket):
                 description = food.get("description", "No description found")
                 brand_name = food.get("brandName", "No brand name found")
                 ingredients = food.get("ingredients", "No ingredients found")
-
+                product = {"upc_code": upc, "brand_name": brand_name, "description": description, "ingredients": ingredients}
+                
                 # Store fetched data in database
                 add_to_db(upc, brand_name, description, ingredients)
+
 
             else:
                 await websocket.send(json.dumps({"error": "Product not found"}))
                 return
 
-            # Parse ingredients into a list and compare allergens
-            ingredients = [ingredient.strip().lower() for ingredient in ingredients.split(",")]
-            matches = [allergen for allergen in allergens if allergen.lower() in ingredients]
+        # Parse ingredients into a list and compare allergens
+        ingredients_list = [ingredient.strip().lower() for ingredient in product["ingredients"].split(",")]
+        matches = [allergen for allergen in allergens if allergen.lower() in ingredients_list]
 
-            # Send list of matches to the client
-            await websocket.send(matches)
+        print(f"{get_timestamp()} - Matching Allergens Found: {matches}")
+
+
+        # Send list of matches to the client
+        await websocket.send(json.dumps(matches))
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
