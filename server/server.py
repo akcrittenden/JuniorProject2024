@@ -9,15 +9,16 @@ import json
 api_key = "DEMO_KEY"
 db_filename = "branded_foods.db"
 
+
 # Initialize the SQLite database
 def initialize_database():
-   # Creates the database and table if they don't exist, and prints status messages.
+    # Creates the database and table if they don't exist, and prints status messages.
 
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
     # Check if database file already exists
-    if os.path.exists(db_filename): 
+    if os.path.exists(db_filename):
         print(f"{get_timestamp()} - Connected to existing database.")
     else:
         cursor.execute("""
@@ -37,7 +38,7 @@ def initialize_database():
 
 def fetch_from_db(upc_code):
     # Retrieve product details from the database by UPC code
-    
+
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
@@ -90,9 +91,9 @@ async def fetch_from_usda(search_term):
         format_fun()
         return None
 
+
 # Store a new product in the database
 def add_to_db(upc_code, brand_name, description, ingredients_list):
-    
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
@@ -116,7 +117,7 @@ async def websocket_handler(websocket):
     try:
         # Receive JSON payload from client
         message = await websocket.recv()
-        
+
         try:
             data = json.loads(message)  # Expecting a JSON object
             upc = data.get("upc")
@@ -124,9 +125,10 @@ async def websocket_handler(websocket):
 
             if not upc or not isinstance(allergens, list):
                 raise ValueError("Invalid input format")
-        
+
         except (json.JSONDecodeError, ValueError):
-            await websocket.send(json.dumps({"error": "Invalid format. Send a JSON object with 'upc' and 'allergens' list."}))
+            await websocket.send(
+                json.dumps({"error": "Invalid format. Send a JSON object with 'upc' and 'allergens' list."}))
             return
 
         print(f"{get_timestamp()} - Received UPC: {upc}")
@@ -152,22 +154,16 @@ async def websocket_handler(websocket):
                 # Store fetched data in database
                 add_to_db(upc, brand_name, description, ingredients)
 
-                # Create response object
-
-                ###
-                # Change to sending list of common elements between allergens and ingredients
-                ###
-                product = {
-                    "brand_name": brand_name,
-                    "description": description,
-                    "ingredients": ingredients
-                }
             else:
                 await websocket.send(json.dumps({"error": "Product not found"}))
                 return
 
-        # Send product data to client
-        await websocket.send(json.dumps(product))
+            # Parse ingredients into a list and compare allergens
+            ingredients_list = [ingredient.strip().lower() for ingredient in ingredients.split(",")]
+            matches = [allergen for allergen in allergens if allergen.lower() in ingredients_list]
+
+            # Send list of matches to the client
+            await websocket.send(matches)
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
@@ -193,8 +189,8 @@ def format_fun():
 
 
 async def main():
-    host = "0.0.0.0"    # Listen on all network interfaces
-    port = 8765 
+    host = "0.0.0.0"  # Listen on all network interfaces
+    port = 8765
 
     # Initialize the database before starting the server
     initialize_database()
