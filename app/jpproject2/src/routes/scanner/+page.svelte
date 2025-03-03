@@ -3,13 +3,17 @@
   import { goto } from "$app/navigation";
   import { Html5QrcodeScanner } from "html5-qrcode"; // easy mode: use .render to make the whole UI for you.
   //import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
-  import { get_ingredients, toSend, allergenResult } from "../../functions/functions";
+  import { get_ingredients, toSend, matchingAllergens } from "../../functions/functions";
+
+let lastScanned: string = "";
 
 function onScanSuccess(decodedText: string, decodedResult: object) {
+  if (decodedText == lastScanned) return;
     // handle the scanned code
     console.log(`Code matched = ${decodedText}`, decodedResult);
     toSend.upc = decodedText; // save to global variable
     get_ingredients();
+    lastScanned = toSend.upc;
   }
 
 function onScanFailure(error: any) {
@@ -60,14 +64,15 @@ const getCameraPreview = async () => {
   <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
   <p>Info from Server:</p>
   <p></p>
-  Food Item:
+  <!-- Food Item:
   {allergenResult.description} 
   <p></p>
   Brand:
   {allergenResult.brandName}
   <p></p>
-  Allergens:
-  {allergenResult.matching_allergens}
+  TO DO: make matching allergens show on UI when found --> 
+  Allergens: {matchingAllergens ? "Searching for allergens..." : "WARNING! ALLERGEN(S) FOUND: {matchingAllergens} " }
+
 </div>
 
 
