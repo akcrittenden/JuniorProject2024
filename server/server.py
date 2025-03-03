@@ -168,7 +168,7 @@ async def websocket_handler(websocket):
 
 
         # Send list of matches to the client
-        await websocket.send(json.dumps(matches))
+        await websocket.send(matches)
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
