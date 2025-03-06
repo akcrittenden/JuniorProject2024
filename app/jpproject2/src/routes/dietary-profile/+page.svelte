@@ -58,28 +58,32 @@
   
   /* Subheading styling */
   h2, div {
-    color: #9395D3;
+    color: #494949;
     max-width: 300px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     font-size: 20px;
   }
   
-  /* Heading styling */
-  h1 {
-    color: #006D77;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    font-size: 35px;
-  }
-  
   /* Button styling */
   button {
-    background-color: rebeccapurple;
-    color: white;
     border: none;
-    padding: 8px;
+    padding: 0.75rem 1.0rem;
+    background-color: rgb(18, 189, 95);
+    color: #ffffff;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
     cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    align-items: center;
+    border-radius: 0.5rem;
+    user-select: none;
+    gap: 0.75rem;
+    box-shadow: 0 4px 6px -1px #488aec31, 0 2px 4px -1px #488aec17;
+    transition: all 0.6s ease;
   }
   
   /* Input styling */
@@ -100,7 +104,7 @@
   label {
     text-transform: uppercase;
     font-size: 0.8em;
-    color: #777;
+    color: #494949;
     margin-top: 10px;
   }
   
@@ -113,8 +117,8 @@
   li {
     padding: 6px 10px;
     border-bottom: 1px solid #ddd;
-    background: #FFD5C2;
-    color: #777;
+    background: #c5c5c5;
+    color: #494949;
   }
   
   li button {
