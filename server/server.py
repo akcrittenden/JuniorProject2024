@@ -168,7 +168,9 @@ async def websocket_handler(websocket):
 
 
         # Send list of matches to the client
-        await websocket.send(matches)
+        await websocket.send(matches)   # TO DO: Can we make this send an object with the Brand Name and
+                                        # description so we can display them in the UI? (After JP
+                                        # Presentation) - Amanda
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")

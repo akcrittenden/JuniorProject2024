@@ -5,15 +5,20 @@
   //import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
   import { get_ingredients, toSend, matchingAllergens } from "../../functions/functions";
 
-let lastScanned: string = "";
+let isCoolingDown: boolean = false;
 
 function onScanSuccess(decodedText: string, decodedResult: object) {
-  if (decodedText == lastScanned) return;
-    // handle the scanned code
+    if (isCoolingDown == true) return; // Ignore if still in cooldown
     console.log(`Code matched = ${decodedText}`, decodedResult);
     toSend.upc = decodedText; // save to global variable
     get_ingredients();
-    lastScanned = toSend.upc;
+
+    // Activate cooldown
+    isCoolingDown = true;
+    setTimeout(() => {
+      isCoolingDown = false; // Deactivate cooldown after 5 seconds
+    }, 5000);
+
   }
 
 function onScanFailure(error: any) {

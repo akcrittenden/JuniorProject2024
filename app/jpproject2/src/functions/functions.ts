@@ -21,28 +21,26 @@ async function getAllergens() {
     console.log("Looking for: ", toSend.allergens);
   }
 
-  export async function get_ingredients(){ 
-    if (toSend.upc === lastScannedUPC) return; // Check if the UPC is the same as the last scanned one
-    await getAllergens(); // save user's allergens to the toSend object
-    ws = await WebSocket.connect("ws://foodlens.tplinkdns.com:8765");
-    // home?: 192.168.0.124:8765
-    //ws = await WebSocket.connect("ws://10.220.12.71:8765");
-    ws.addListener((msg) => {
-      console.log("Received Message:", msg);
-      if (typeof msg.data === "string") { // if we just get a string back, like product not found
-        stringResult = msg.data; //receives the ingredients and description as a one string
-        console.log("Received string: ", stringResult);
-        console.log("Matching allergens: ", matchingAllergens);
-        if (!stringResult.includes("Product not found"))
-              matchingAllergens.push(stringResult);
-            //TO DO - display when product not found in UI
-      } 
-    });
-    await ws.send(JSON.stringify(toSend)); // sends the UPC and allergens to the server
-    lastScannedUPC = toSend.upc; // Update the last scanned UPC code
-    console.log("Matching allergens: ", matchingAllergens); //receive info from server
-    return matchingAllergens; // returns result of ingredient comparison
-    // TO DO: clear matchingAllergens
-  };
+export async function get_ingredients(){ 
+  if (matchingAllergens.length > 0) matchingAllergens.length = 0; // Clear the matchingAllergens array if it has elements
+  await getAllergens(); // save user's allergens to the toSend object
+  ws = await WebSocket.connect("ws://foodlens.tplinkdns.com:8765");
+  // home?: 192.168.0.124:8765
+  //ws = await WebSocket.connect("ws://10.220.12.71:8765");
+  ws.addListener((msg) => {
+    console.log("Received Message:", msg);
+// if we just get a string back, like product not found
+      stringResult = String(msg.data); //receives the ingredients and description as a one string
+      console.log("Received string: ", stringResult);
+      console.log("Matching allergens: ", matchingAllergens);
+      if (!stringResult.includes("Product not found"))
+            matchingAllergens.push(stringResult);
+          //TO DO - display when product not found in UI
+  });
+  await ws.send(JSON.stringify(toSend)); // sends the UPC and allergens to the server
+  console.log("Matching allergens: ", matchingAllergens); //receive info from server
+  return matchingAllergens; // returns result of ingredient comparison
+  // TO DO: clear matchingAllergens
+};
 
   
