@@ -16,8 +16,8 @@ function onScanSuccess(decodedText: string, decodedResult: object) {
     // Activate cooldown
     isCoolingDown = true;
     setTimeout(() => {
-      isCoolingDown = false; // Deactivate cooldown after 5 seconds
-    }, 5000);
+      isCoolingDown = false; // 2 second cooldown, but this delays receiving stuff from the server
+    }, 2000);
 
   }
 
@@ -76,7 +76,10 @@ const getCameraPreview = async () => {
   {allergenResult.brandName}
   <p></p>
   TO DO: make matching allergens show on UI when found --> 
-  Allergens: {matchingAllergens ? "Searching for allergens..." : "WARNING! ALLERGEN(S) FOUND: {matchingAllergens} " }
+  Allergens: 
+  <!-- Megaaaaaaaaan make it pretty pleeeeeease - matching allergens is the array that
+   holds the allergens received from the server, but if the product isn't found, index 0 is == 
+   to "Product not found", so we want to display that if index 0 = that -->
 
 </div>
 
