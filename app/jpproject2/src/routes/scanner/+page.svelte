@@ -2,8 +2,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { Html5QrcodeScanner } from "html5-qrcode"; // easy mode: use .render to make the whole UI for you.
-  //import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
+  import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
   import { get_ingredients, toSend, matchingAllergens } from "../../functions/functions";
+  import { dev } from "$app/environment";
 
 let isCoolingDown: boolean = false;
 
@@ -27,31 +28,55 @@ function onScanFailure(error: any) {
   console.warn(`Code scan error = ${error}`);
 }
 
+// const getCameraPreview = async () => {
+//   console.log("Camera preview starting...");
+//   let html5QrcodeScanner = new Html5QrcodeScanner(
+//   "reader",
+//   { fps: 10, qrbox: {width: 250, height: 250} },
+//   /* verbose= */ false);
+//   html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+//   var frame = document.getElementById('scanRegion');
+//   const stream = await navigator.mediaDevices.getUserMedia({ 
+//     audio: false,  
+//     video: {
+//       facingMode: 
+//       { ideal: "environment" }
+//     }
+//   });
+//   const video = document.getElementById('video') as HTMLVideoElement;
+//   video.srcObject = stream;
+//   video.play();
+//   if (frame) {
+//     if (frame.style.display === 'none') {
+//       frame.style.display = 'block';
+//     } else {
+//       frame.style.display = 'none';
+//     }
+//   }
+// };
+
+
+//PLAYING WITH PRO VERSION
+
+
 const getCameraPreview = async () => {
   console.log("Camera preview starting...");
-  let html5QrcodeScanner = new Html5QrcodeScanner(
-  "reader",
-  { fps: 10, qrbox: {width: 250, height: 250} },
-  /* verbose= */ false);
-  html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-  var frame = document.getElementById('scanRegion');
-  const stream = await navigator.mediaDevices.getUserMedia({ 
-    audio: false,  
-    video: {
-      facingMode: 
-      { ideal: "environment" }
+
+  Html5Qrcode.getCameras().then(devices =>{
+  if (devices && devices.length) {
+    const cameraId = devices[1].id;
+    const html5Qrcode = new Html5Qrcode("reader");
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 }
     }
-  });
-  const video = document.getElementById('video') as HTMLVideoElement;
-  video.srcObject = stream;
-  video.play();
-  if (frame) {
-    if (frame.style.display === 'none') {
-      frame.style.display = 'block';
-    } else {
-      frame.style.display = 'none';
-    }
+    html5Qrcode.start(cameraId, config, onScanSuccess, onScanFailure);
   }
+  else {
+    console.log("No cameras found");
+  }
+})
+
 };
 
 </script>
