@@ -28,56 +28,56 @@ function onScanFailure(error: any) {
   console.warn(`Code scan error = ${error}`);
 }
 
-// const getCameraPreview = async () => {
-//   console.log("Camera preview starting...");
-//   let html5QrcodeScanner = new Html5QrcodeScanner(
-//   "reader",
-//   { fps: 10, qrbox: {width: 250, height: 250} },
-//   /* verbose= */ false);
-//   html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-//   var frame = document.getElementById('scanRegion');
-//   const stream = await navigator.mediaDevices.getUserMedia({ 
-//     audio: false,  
-//     video: {
-//       facingMode: 
-//       { ideal: "environment" }
-//     }
-//   });
-//   const video = document.getElementById('video') as HTMLVideoElement;
-//   video.srcObject = stream;
-//   video.play();
-//   if (frame) {
-//     if (frame.style.display === 'none') {
-//       frame.style.display = 'block';
-//     } else {
-//       frame.style.display = 'none';
-//     }
-//   }
-// };
+const getCameraPreview = async () => {
+  console.log("Camera preview starting...");
+  let html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox: {width: 250, height: 250} },
+  /* verbose= */ false);
+  html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  var frame = document.getElementById('scanRegion');
+  const stream = await navigator.mediaDevices.getUserMedia({ 
+    audio: false,  
+    video: {
+      facingMode: 
+      { ideal: "environment" }
+    }
+  });
+  const video = document.getElementById('video') as HTMLVideoElement;
+  video.srcObject = stream;
+  video.play();
+  if (frame) {
+    if (frame.style.display === 'none') {
+      frame.style.display = 'block';
+    } else {
+      frame.style.display = 'none';
+    }
+  }
+};
 
 
 //PLAYING WITH PRO VERSION
 
 
-const getCameraPreview = async () => {
-  console.log("Camera preview starting...");
+// const getCameraPreview = async () => {
+//   console.log("Camera preview starting...");
 
-  Html5Qrcode.getCameras().then(devices =>{
-  if (devices && devices.length) {
-    const cameraId = devices[1].id;
-    const html5Qrcode = new Html5Qrcode("reader");
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 }
-    }
-    html5Qrcode.start(cameraId, config, onScanSuccess, onScanFailure);
-  }
-  else {
-    console.log("No cameras found");
-  }
-})
+//   Html5Qrcode.getCameras().then(devices =>{
+//   if (devices && devices.length) {
+//     const cameraId = devices[1].id;
+//     const html5Qrcode = new Html5Qrcode("reader");
+//     const config = {
+//       fps: 10,
+//       qrbox: { width: 250, height: 250 }
+//     }
+//     html5Qrcode.start(cameraId, config, onScanSuccess, onScanFailure);
+//   }
+//   else {
+//     console.log("No cameras found");
+//   }
+// })
 
-};
+// };
 
 </script>
 
@@ -92,7 +92,7 @@ const getCameraPreview = async () => {
   </div>
 
   <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
-  <p>Info from Server:</p>
+  <!-- <p>Info from Server:</p> -->
   <p></p>
   <!-- Food Item:
   {allergenResult.description} 
