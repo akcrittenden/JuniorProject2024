@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@plugin 'flowbite/plugin';
+/* Removed invalid @plugin rule. Ensure the plugin is configured in tailwind.config.js */
 
 /* @custom-variant dark (&:where(.dark, .dark *)); I just got this stuff from flowbite-svelte.com*/
 
