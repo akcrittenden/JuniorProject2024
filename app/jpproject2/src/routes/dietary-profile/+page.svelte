@@ -1,6 +1,22 @@
-<script>
-  import { allergen, severity, allergens, addAllergen, removeAllergen } from '../../stores/allergens.js';
+<script lang="ts">
+  import { allergen, severity, allergens, addAllergen, removeAllergen, updateAllergen } from '../../stores/allergens.js';
   import { goto } from '$app/navigation';
+
+  let editingIndex: number | null = null;
+  let editedAllergen = '';
+  let editedSeverity = '';
+
+  function startEdit(index: number, item: { allergen: string; severity: string }){
+    editingIndex = index;
+    editedAllergen = item.allergen;
+    editedSeverity = item.severity;
+  }
+
+  function saveEdit(index: number){
+    updateAllergen(index, editedAllergen, editedSeverity);
+    editingIndex = null;
+  }
+
 </script>
 
 <!-- Back button -->
@@ -28,17 +44,35 @@
 
   <!-- Enter button -->
   <div class="form-field">
-    <button on:click={() => addAllergen($allergen, $severity)}>Enter</button>
+    <button on:click={() => {
+      addAllergen($allergen, $severity);
+      allergen.set("");
+      severity.set("mild");
+    }}>Enter</button>
   </div>
 </div>
 
 <h2><u>Allergen List:</u></h2>
 
 <ul>
-  {#each $allergens as item}
+  {#each $allergens as item, index}
     <li>
+      {#if editingIndex === index}
+    <!-- Editing mode -->
+      <input type="text" bind:value={editedAllergen} />
+      <select bind:value={editedSeverity}>
+        <option value="mild">Mild</option>
+        <option value="moderate">Moderate</option>
+        <option value="severe">Severe</option>
+    </select>
+      <button on:click={() => saveEdit(index)}>Save</button>
+      <button on:click={() => (editingIndex = null)}>Cancel</button>
+      {:else}
+      <!-- Display Mode -->
       <span>{item.allergen} - {item.severity}</span>
+      <button on:click={() => startEdit(index, item)}>Edit</button>
       <button on:click={() => removeAllergen(item)}>&times;</button>
+      {/if}
     </li>
   {/each}
 </ul>
