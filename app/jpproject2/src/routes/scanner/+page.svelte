@@ -46,9 +46,16 @@
   const getCameraPreview = async () => {
     console.log("Starting camera preview...");
     var cameraID;
+
+    //check camera permissions
+    console.log("Checking camera permissions...");
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true});
+      console.log("Camera permissions granted.");
+    
     
     //get camera
-    Html5Qrcode.getCameras()         //WILL TRIGGER PERMISSIONS
+    Html5Qrcode.getCameras() 
       .then((devices) => {
         if (devices && devices.length) {
           cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
@@ -68,7 +75,7 @@
               //call the function to handle the scan result
               },
               (errorMessage) => {
-                //parse error, ignore it
+                //parse error, ignore it TODO: if wrong kind of code, say so
                 console.log("Error: ", errorMessage);
               }
             )
@@ -84,29 +91,13 @@
       });
 
     //start reader
+  } catch (err) {
+    console.error("Camera permissions denied or unavailable: ", err);
+    alert("Camera access is needed to scan items. Please enable camera permissions for Food Lens on your device.");
+  }
   };
 
-  //PLAYING WITH PRO VERSION
 
-  // const getCameraPreview = async () => {
-  //   console.log("Camera preview starting...");
-
-  //   Html5Qrcode.getCameras().then(devices =>{
-  //   if (devices && devices.length) {
-  //     const cameraId = devices[1].id;
-  //     const html5Qrcode = new Html5Qrcode("reader");
-  //     const config = {
-  //       fps: 10,
-  //       qrbox: { width: 250, height: 250 }
-  //     }
-  //     html5Qrcode.start(cameraId, config, onScanSuccess, onScanFailure);
-  //   }
-  //   else {
-  //     console.log("No cameras found");
-  //   }
-  // })
-
-  // };
 </script>
 
 <br />
