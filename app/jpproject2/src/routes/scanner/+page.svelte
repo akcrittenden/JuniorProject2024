@@ -1,7 +1,6 @@
 <!-- //CANERA SCANNER PAGE// -->
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { Html5QrcodeScanner } from "html5-qrcode"; // easy mode: use .render to make the whole UI for you.
   import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
   import {
     get_ingredients,
@@ -38,9 +37,7 @@
     console.warn(`Code scan error = ${error}`);
   }
 
-  const qrCodeSuccessCallback = (decodedText: string, decodedResult: string) => {
-    //handle success
-  }
+
 
   //--------------  custom mode scanner ---------------
   const getCameraPreview = async () => {
@@ -48,19 +45,20 @@
     var cameraID;
     
     //get camera
-    Html5Qrcode.getCameras()         //WILL TRIGGER PERMISSIONS
+    Html5Qrcode.getCameras()         //should trigger permissions prompt
       .then((devices) => {
         if (devices && devices.length) {
           cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
 
           //start camera
           const html5Qrcode = new Html5Qrcode("reader"); //create a new instance of the scanner
+          const config = {
+            qrbox: { width: 200, height: 200 },
+            fps: 2, //SCANNING speed, not camera's displayed fps
+          }
           html5Qrcode.start(
-              cameraID,
-              {
-                fps: 8, //SCANNING speed, not camera's displayed fps
-                qrbox: { width: 250, height: 250 },
-              },
+              {facingMode: "environment"}, //presumably will start using back camera
+              config,
               (decodedText, decodedResult) => {
                 html5Qrcode.pause(true) //call the function to handle the scan result
                 console.log("QR code detected: ", decodedText);
@@ -68,12 +66,14 @@
               //call the function to handle the scan result
               },
               (errorMessage) => {
-                //parse error, ignore it
+                //parse error
+                //maybe toast here - scanning error, please try again @Megan
+                html5Qrcode.resume(); // resume scanning after error
                 console.log("Error: ", errorMessage);
               }
             )
             .catch((err) => {
-              console.error("Start failed: ", err); //start failed, handle it.
+              console.error("Starting camera failed: ", err); //start failed, handle it.
             });
         } else {
           console.error("No cameras found.");
@@ -86,27 +86,7 @@
     //start reader
   };
 
-  //PLAYING WITH PRO VERSION
 
-  // const getCameraPreview = async () => {
-  //   console.log("Camera preview starting...");
-
-  //   Html5Qrcode.getCameras().then(devices =>{
-  //   if (devices && devices.length) {
-  //     const cameraId = devices[1].id;
-  //     const html5Qrcode = new Html5Qrcode("reader");
-  //     const config = {
-  //       fps: 10,
-  //       qrbox: { width: 250, height: 250 }
-  //     }
-  //     html5Qrcode.start(cameraId, config, onScanSuccess, onScanFailure);
-  //   }
-  //   else {
-  //     console.log("No cameras found");
-  //   }
-  // })
-
-  // };
 </script>
 
 <br />
