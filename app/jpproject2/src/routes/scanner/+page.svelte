@@ -53,7 +53,7 @@
           //start camera
           const html5Qrcode = new Html5Qrcode("reader"); //create a new instance of the scanner
           const config = {
-            qrbox: { width: 200, height: 200 }, //TODO@akcrittenden make look nice
+            qrbox: { width: 275, height: 275 }, //TODO@akcrittenden make look nice
             fps: 2, //SCANNING speed, not camera's displayed fps
           }
           html5Qrcode.start(
@@ -67,7 +67,7 @@
               },
               (errorMessage) => {
                 //parse error
-                //maybe toast here - scanning error, please try again TODO #1@megbyrne
+                //maybe toast here - scanning error, please try again TODO@megbyrne
                 html5Qrcode.resume(); // resume scanning after error
                 console.log("Error: ", errorMessage);
               }
