@@ -74,3 +74,9 @@
 <button onclick={() => goto("/scanner")}>
   <i class="fa-solid fa-barcode"></i> Scan Products
 </button>
+
+<br />
+
+<button onclick={() => goto("/settings")}>
+  <i class="fa-solid fa-gear"></i> Settings
+</button>
