@@ -9,7 +9,6 @@
     "core:default",
     "shell:allow-open",
     "websocket:default",
-    "websocket:default",
     "sql:default",
     "sql:allow-execute"
   ]
