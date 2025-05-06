@@ -20,6 +20,9 @@
     isPageLoaded = true; // Set the page as loaded
     getCameraPreview(); // Call the function to start the camera preview when the component mounts
 	});
+  import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
+  import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
+  import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
 
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
