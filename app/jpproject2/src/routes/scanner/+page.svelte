@@ -11,6 +11,15 @@
   import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
   import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
   import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
+  import { onMount } from 'svelte';
+
+  let isPageLoaded = false;
+
+	onMount(() => {
+		console.log('page loaded, initializing camera preview');
+    isPageLoaded = true; // Set the page as loaded
+    getCameraPreview(); // Call the function to start the camera preview when the component mounts
+	});
 
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
@@ -96,15 +105,24 @@
 
 </script>
 
+<!-- loader: -->
+
+
 <br />
 <button onclick={() => goto("/")}>Back</button>
 
 <div>
   <div id="reader" style="width: 400px;">
-    <br />
-    <button onclick={getCameraPreview}>Open Camera and Start Scanning</button>
-    <br />
+
+    <div class="loader">  
+      <i class="fa-solid fa-gear"></i>
+    </div>
   </div>
+
+    <!-- <br />
+    <button onclick={getCameraPreview}>Open Camera and Start Scanning</button>
+    <br /> -->
+
 
   <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
   <!-- <p>Info from Server:</p> -->
