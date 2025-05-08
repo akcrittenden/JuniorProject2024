@@ -8,6 +8,9 @@
     matchingAllergens,
   } from "../../functions/functions";
   import { dev } from "$app/environment";
+  import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
+  import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
+  import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
   import { onMount } from 'svelte';
 
   let isPageLoaded = false;
@@ -20,6 +23,7 @@
 
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
+  let toast_ready: boolean = false; // used to trigger the toasts
 
  async function onScanSuccess(decodedText: string, decodedResult: object, scanner: Html5Qrcode) {
      if (isCoolingDown && decodedText === lastScanned) return; // Ignore if still in cooldown
@@ -27,7 +31,10 @@
     console.log(`Code matched = ${decodedText}`, decodedResult);
     toSend.upc = decodedText; // save to global variable
     lastScanned = decodedText; // save last scanned code
+
+    toast_ready = false;
     await get_ingredients();
+    toast_ready = true;
     
     setTimeout(() => {
       scanner.resume(); // resume scanning after 2 seconds
@@ -132,3 +139,14 @@
    holds the allergens received from the server, but if the product isn't found, index 0 is == 
    to "Product not found", so we want to display that if index 0 = that -->
 </div>
+
+<!-- Triggers the toasts -->
+{#if toast_ready} <!-- Only shows toast after get_ingredients() is finished -->
+  {#if matchingAllergens[0] == "Product not found"}
+    <ProductNotFoundToast />
+  {:else if matchingAllergens.length == 0}
+    <NoAllergensDetectedToast />
+  {:else}
+    <AllergensDetectedToast />
+  {/if}
+{/if}
