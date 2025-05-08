@@ -1,6 +1,5 @@
 <!-- //CANERA SCANNER PAGE// -->
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
   import {
     get_ingredients,
@@ -8,6 +7,7 @@
     matchingAllergens,
   } from "../../functions/functions";
   import { dev } from "$app/environment";
+  import BottomNavigation from "../../components/BottomNavigation.svelte";
 
   import { onMount } from 'svelte';
 
@@ -108,10 +108,6 @@
 
 <!-- loader: -->
 
-
-<br />
-<button onclick={() => goto("/")}>Back</button>
-
 <div>
   <div id="reader" style="width: 400px;">
 
@@ -136,9 +132,6 @@
   <p></p>
   TO DO: make matching allergens show on UI when found -->
   Allergens:
-  <!-- Megaaaaaaaaan make it pretty pleeeeeease - matching allergens is the array that
-   holds the allergens received from the server, but if the product isn't found, index 0 is == 
-   to "Product not found", so we want to display that if index 0 = that -->
 </div>
 
 <!-- Triggers the toasts -->
@@ -151,3 +144,5 @@
     <AllergensDetectedToast />
   {/if}
 {/if}
+
+<BottomNavigation />

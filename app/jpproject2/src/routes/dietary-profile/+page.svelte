@@ -1,6 +1,6 @@
 <script lang="ts">
   import { allergen, severity, allergens, addAllergen, removeAllergen, updateAllergen } from '../../stores/allergens.js';
-  import { goto } from '$app/navigation';
+  import BottomNavigation from '../../components/BottomNavigation.svelte';
 
   let editingIndex: number | null = null;
   let editedAllergen = '';
@@ -18,10 +18,6 @@
   }
 
 </script>
-
-<!-- Back button -->
-<br />
-<button on:click={() => goto("/")}>Back</button>
 
 <h1>Enter Allergens:</h1>
 
@@ -159,3 +155,6 @@
     margin-left: 10px;
   }
 </style>
+
+<BottomNavigation />
+

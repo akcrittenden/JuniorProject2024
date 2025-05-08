@@ -1,12 +1,10 @@
 <!-- SETTINGS PAGE -->
  <script lang='ts'>
-  import { goto } from "$app/navigation";
+  import BottomNavigation from "../../components/BottomNavigation.svelte";
 
 </script>
 
-
-<br />
-<button on:click={() => goto("/")}>Back</button>
+<BottomNavigation />
 
 
 <!-- this page needs to have a setting to turn vibration for scanning on or off

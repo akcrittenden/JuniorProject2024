@@ -3,6 +3,7 @@
 <script>
   import { goto } from "$app/navigation";
   import { Alert } from 'flowbite-svelte'; //Amanda's trying things lol
+  import BottomNavigation from "../components/BottomNavigation.svelte";
 </script>
 
 <!-- Barcode Icon -->
@@ -65,18 +66,4 @@
 
 <h1>FoodLens</h1>
 
-<button onclick={() => goto("/dietary-profile")}>
-  <i class="fa-solid fa-list-ul"></i> Dietary Profile
-</button>
-
-<br />
-
-<button onclick={() => goto("/scanner")}>
-  <i class="fa-solid fa-barcode"></i> Scan Products
-</button>
-
-<br />
-
-<button onclick={() => goto("/settings")}>
-  <i class="fa-solid fa-gear"></i> Settings
-</button>
+<BottomNavigation />
