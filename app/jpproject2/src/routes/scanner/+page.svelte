@@ -8,9 +8,7 @@
     matchingAllergens,
   } from "../../functions/functions";
   import { dev } from "$app/environment";
-  import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
-  import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
-  import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
+
   import { onMount } from 'svelte';
 
   let isPageLoaded = false;
