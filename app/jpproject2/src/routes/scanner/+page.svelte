@@ -24,7 +24,7 @@
 
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
-  let toast_ready: boolean = false; // used to trigger the toasts
+  let toast_ready: boolean = false; // Flag to control the toast display
 
  async function onScanSuccess(decodedText: string, decodedResult: object, scanner: Html5Qrcode) {
      if (isCoolingDown && decodedText === lastScanned) return; // Ignore if still in cooldown
@@ -33,10 +33,10 @@
     toSend.upc = decodedText; // save to global variable
     lastScanned = decodedText; // save last scanned code
 
-    toast_ready = false;
-    await get_ingredients();
+    toast_ready = false; // Reset the toast flag
+    await get_ingredients()
     toast_ready = true;
-    
+
     setTimeout(() => {
       scanner.resume(); // resume scanning after 2 seconds
       console.log("Camera resumed to scan again");
@@ -136,11 +136,11 @@
 
 <!-- Triggers the toasts -->
 {#if toast_ready} <!-- Only shows toast after get_ingredients() is finished -->
-  {#if matchingAllergens[0] == "Product not found"}
-    <ProductNotFoundToast />
-  {:else if matchingAllergens.length == 0}
+  {#if matchingAllergens.length == 0}
     <NoAllergensDetectedToast />
-  {:else}
+  {:else if matchingAllergens[0] == '1'}
+    <ProductNotFoundToast />
+  {:else if matchingAllergens[0] == 'z'}
     <AllergensDetectedToast />
   {/if}
 {/if}

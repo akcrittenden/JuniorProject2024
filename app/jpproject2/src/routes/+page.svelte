@@ -4,6 +4,7 @@
   import { goto } from "$app/navigation";
   import { Alert } from 'flowbite-svelte'; //Amanda's trying things lol
   import BottomNavigation from "../components/BottomNavigation.svelte";
+
 </script>
 
 <!-- Barcode Icon -->
