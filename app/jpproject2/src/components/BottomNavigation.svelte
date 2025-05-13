@@ -6,7 +6,7 @@
     HomeSolid,
     SeedlingSolid,
     EyeSolid,
-    UserSettingsSolid,
+    PenSolid,
   } from "flowbite-svelte-icons";
   import { page } from "$app/stores";
 
@@ -29,7 +29,7 @@
   <BottomNavItem btnName="Scanner" href="/scanner">
     <EyeSolid />
   </BottomNavItem>
-  <BottomNavItem btnName="Settings" href="/settings">
-    <UserSettingsSolid />
+  <BottomNavItem btnName="Manual Entry" href="/scan">
+    <PenSolid />
   </BottomNavItem>
 </BottomNav>
