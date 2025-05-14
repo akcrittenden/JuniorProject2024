@@ -1,6 +1,7 @@
 <script lang="ts">
   import { allergen, severity, allergens, addAllergen, removeAllergen, updateAllergen } from '../../stores/allergens.js';
   import BottomNavigation from '../../components/BottomNavigation.svelte';
+  import TopBanner from "../../components/TopBanner.svelte";
 
   let editingIndex: number | null = null;
   let editedAllergen = '';
@@ -18,6 +19,8 @@
   }
 
 </script>
+
+<TopBanner />
 
 <h1>Enter Allergens:</h1>
 

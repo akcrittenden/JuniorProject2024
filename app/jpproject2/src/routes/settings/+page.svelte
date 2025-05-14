@@ -1,8 +1,11 @@
 <!-- SETTINGS PAGE -->
  <script lang='ts'>
   import BottomNavigation from "../../components/BottomNavigation.svelte";
+  import TopBanner from "../../components/TopBanner.svelte";
 
 </script>
+
+<TopBanner />
 
 <BottomNavigation />
 
