@@ -8,6 +8,8 @@
   import WebSocket from "@tauri-apps/plugin-websocket";
   import { allergen, severity, allergens, addAllergen } from '../../stores/allergens.js'; //import allergens from store
   import { onMount } from 'svelte';
+  import BottomNavigation from '../../components/BottomNavigation.svelte';
+  import TopBanner from "../../components/TopBanner.svelte";
 
 //------------------------------------------
 
@@ -58,9 +60,7 @@
 
 </script>
 
-
-<br />
-<button onclick={() => goto("/")}>Back</button>
+<TopBanner />
 
 <!-- <input bind:value={testing_UPC_code} placeholder="enter upc code" />
 <button type="submit" onclick={get_ingredients} >Enter</button>  -->
@@ -99,20 +99,5 @@ Brand:
 Ingredients:
 {jsonDump.ingredients}
 
-<!-- Temporary for testing: Prints allergens/severity to screen -->
-<p> Stored Allergens TEST: </p>
-<p>
-  {#each $allergens as { allergen, severity }}
-      {allergen} - {severity}<br>
-  {/each}
-</p>
-
-
-<!-- <p>{finalArray}</p> -->
-
-
-<!-- Here we basically need to call get_ingredients() with the UPC the user
-entered in the input box (need an event listener to use get_ingredients with
-a parameter). Then display
-<p>{finalArray}</p> to show the ingredients from the server.-->
+<BottomNavigation />
 
