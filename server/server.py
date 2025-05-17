@@ -164,13 +164,17 @@ async def websocket_handler(websocket):
         ingredients_list = [ingredient.strip().lower() for ingredient in product["ingredients"].split(",")]
         matches = [allergen for allergen in allergens if allergen.lower() in ingredients_list]
 
-        print(f"{get_timestamp()} - Matching Allergens Found: {matches}")
-
-
-        # Send list of matches to the client
-        await websocket.send(matches)   # TO DO: Can we make this send an object with the Brand Name and
-                                        # description so we can display them in the UI? (After JP
-                                        # Presentation) - Amanda
+        # Check if any matches were found
+        if not matches:
+                # Send no matches found
+                print(f"{get_timestamp()} - Matching Allergens Found: None")
+                await websocket.send("None")
+        else:
+             # Send list of matches to the client
+            print(f"{get_timestamp()} - Matching Allergens Found: {matches}")
+            await websocket.send(matches)   # TO DO: Can we make this send an object with the Brand Name and
+                                            # description so we can display them in the UI? (After JP
+                                            # Presentation) - Amanda
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
@@ -203,8 +207,7 @@ async def main():
     initialize_database()
 
     # Start WebSocket server
-    print(f"{get_timestamp()} - Starting server on allerscan.tplinkdns.com:{port}")
-
+    print(f"{get_timestamp()} - Starting server on foodlens .tplinkdns.com:{port}")
     async with websockets.serve(websocket_handler, host, port):
         await asyncio.gather(periodic_message())
         await asyncio.Future()  # Run forever
