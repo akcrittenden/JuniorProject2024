@@ -23,13 +23,13 @@
   <BottomNavItem btnName="Home" href="/">
     <HomeSolid />
   </BottomNavItem>
-  <BottomNavItem btnName="Dietary Profile" href="/dietary-profile">
+  <BottomNavItem btnName="Allergens" href="/dietary-profile">
     <SeedlingSolid />
   </BottomNavItem>
   <BottomNavItem btnName="Scanner" href="/scanner">
     <EyeSolid />
   </BottomNavItem>
-  <BottomNavItem btnName="Manual Entry" href="/scan">
+  <BottomNavItem btnName="Manual" href="/scan">
     <PenSolid />
   </BottomNavItem>
 </BottomNav>
