@@ -47,7 +47,7 @@ export async function get_ingredients(){
 
       console.log("String result: ", stringResult);
 
-      if (stringResult.length == 0){ // empty array - no allergens found
+      if (stringResult.includes("None")){ // empty array - no allergens found
             matchingAllergens.push('0'); 
             console.log("No matching allergens");
       }

@@ -10,7 +10,7 @@
   import BottomNavigation from "../../components/BottomNavigation.svelte";
   import TopBanner from "../../components/TopBanner.svelte";
 
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   let isPageLoaded = false;
 
@@ -19,6 +19,21 @@
     isPageLoaded = true; // Set the page as loaded
     getCameraPreview(); // Call the function to start the camera preview when the component mounts
 	});
+
+  let html5QrcodeInstance: Html5Qrcode | null = null;
+
+  onDestroy(() => {
+  // Stop the camera when navigating away
+  if (html5QrcodeInstance) {
+    html5QrcodeInstance.stop().then(() => {
+      html5QrcodeInstance = null;
+      console.log('Camera stopped');
+    }).catch((err) => {
+      console.error('Failed to stop camera:', err);
+    });
+  }
+});
+
   import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
   import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
   import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
@@ -56,7 +71,6 @@
   }
 
 
-
   //--------------  custom mode scanner ---------------
   const getCameraPreview = async () => {
     console.log("Starting camera preview...");
@@ -67,26 +81,25 @@
       .then((devices) => {
         if (devices && devices.length) {
           cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
-
+          const html5QrcodeInstance = new Html5Qrcode("reader"); // create a new instance of the scanner with verbose logging if in dev mode
           //start camera
-          const html5Qrcode = new Html5Qrcode("reader"); //create a new instance of the scanner
+          // const html5Qrcode = new Html5Qrcode("reader"); //create a new instance of the scanner
           const config = {
             qrbox: { width: 275, height: 275 }, //TODO@akcrittenden make look nice
             fps: 2, //SCANNING speed, not camera's displayed fps
           }
-          html5Qrcode.start(
+          html5QrcodeInstance.start(
               {facingMode: "environment"}, //presumably will start using back camera
               config,
               (decodedText, decodedResult) => {
-                html5Qrcode.pause(true)
+                html5QrcodeInstance.pause(true)
                 console.log("QR code detected: ", decodedText);
-                onScanSuccess(decodedText, decodedResult, html5Qrcode); 
+                onScanSuccess(decodedText, decodedResult, html5QrcodeInstance); 
               //call the function to handle the scan result
               },
               (errorMessage) => {
                 //parse error
-                //maybe toast here - scanning error, please try again TODO@megbyrne
-                html5Qrcode.resume(); // resume scanning after error
+                html5QrcodeInstance.resume(); // resume scanning after error
                 console.log("Error: ", errorMessage);
               }
             )
@@ -118,28 +131,13 @@
       <i class="fa-solid fa-gear"></i>
     </div>
   </div>
-
-    <!-- <br />
-    <button onclick={getCameraPreview}>Open Camera and Start Scanning</button>
-    <br /> -->
-
-
   <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
-  <!-- <p>Info from Server:</p> -->
-  <p></p>
-  <!-- Food Item:
-  {allergenResult.description} 
-  <p></p>
-  Brand:
-  {allergenResult.brandName}
-  <p></p>
-  TO DO: make matching allergens show on UI when found -->
-  Allergens:
+
 </div>
 
 <!-- Triggers the toasts -->
 {#if toast_ready} <!-- Only shows toast after get_ingredients() is finished -->
-  {#if matchingAllergens.length == 0}
+  {#if matchingAllergens[0] == '0'}
     <NoAllergensDetectedToast />
   {:else if matchingAllergens[0] == '1'}
     <ProductNotFoundToast />
