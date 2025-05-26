@@ -12,7 +12,7 @@
   import { TextSizeOutline } from "flowbite-svelte-icons";
 
   let isPageLoaded = false;
-  let html5QrcodeInstance: Html5Qrcode | null = null;
+  let html5QrcodeInstance: Html5Qrcode | null;
 
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
@@ -57,24 +57,24 @@
     setTimeout(() => {
       scanner.resume(); // resume scanning after 2 seconds
       console.log("Camera resumed to scan again");
-    }, 2000);
+    }, 500);
 
     isCoolingDown = true;
     setTimeout(() => {
       isCoolingDown = false; // 2 second cooldown, but this delays receiving stuff from the server
-    }, 1500);
+    }, 150);
   }
 
-  function switchCamera() {
-    facingMode = facingMode === "environment" ? "user" : "environment";
-    if (html5QrcodeInstance) {
-      html5QrcodeInstance.stop().then(() => {
-        getCameraPreview();
-      });
-    } else {
-      getCameraPreview();
-    }
-  }
+  // function switchCamera() {
+  //   facingMode = facingMode === "environment" ? "user" : "environment";
+  //   if (html5QrcodeInstance) {
+  //     html5QrcodeInstance.stop().then(() => {
+  //       getCameraPreview();
+  //     });
+  //   } else {
+  //     getCameraPreview();
+  //   }
+  // }
 
   let facingMode: "environment" | "user" = "environment"; // default to back camera
 
@@ -86,8 +86,7 @@
       .then((devices) => {
         if (devices && devices.length) {
           cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
-          const html5QrcodeInstance = new Html5Qrcode("scanner"); // create a new instance of the scanner with verbose logging if in dev mode
-          //start camera
+          html5QrcodeInstance = new Html5Qrcode("scanner");          //start camera
           const config = { 
             qrbox: { width: 250, height: 250 }, // size of the scanning box
             fps: 3, //SCANNING speed, not camera's displayed fps
@@ -99,14 +98,14 @@
               { facingMode },
               config,
               (decodedText, decodedResult) => {
-                html5QrcodeInstance.pause(true);
+                html5QrcodeInstance?.pause(true);
                 console.log("QR code detected: ", decodedText);
                 onScanSuccess(decodedText, decodedResult, html5QrcodeInstance);
                 //call the function to handle the scan result
               },
               (errorMessage) => {
                 //parse error
-                html5QrcodeInstance.resume(); // resume scanning after error
+                html5QrcodeInstance?.resume(); // resume scanning after error
                 console.log("Error: ", errorMessage);
               }
             )
@@ -127,6 +126,8 @@
 
 <div class="scanner-container">
     <div id="scanner" class="scanner"></div>
+        <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
+
 </div>
 
 <!-- Triggers the toasts -->
@@ -145,11 +146,10 @@
     .scanner-container {
         display: grid;
         place-items: center;
-        padding-left: 30px;
-        padding-right: 30px;
     }
 
     .scanner {
+        display: flex;
         width: 100%;
         height: 100%;
         max-width: 300px; /* Limit the maximum width */

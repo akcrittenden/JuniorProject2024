@@ -22,17 +22,16 @@
 
 <TopBanner />
 
-<h1>Enter Allergens:</h1>
-
 <div class="form-row">
+
   <!-- Allergen input -->
-  <div class="form-field">
-    <label for="allergen">Allergen:</label>
+  <div class="form-field input-field">
+    <label for="allergen">Enter Allergen:</label>
     <input type="text" id="allergen" bind:value={$allergen} />
   </div>
 
   <!-- Severity dropdown menu -->
-  <div class="form-field">
+  <div class="form-field select-field">
     <label for="severity">Severity:</label>
     <select id="severity" bind:value={$severity}>
       <option value="mild">Mild</option>
@@ -42,16 +41,18 @@
   </div>
 
   <!-- Enter button -->
-  <div class="form-field">
+  <div class="form-field button-field">
     <button on:click={() => {
       addAllergen($allergen, $severity);
       allergen.set("");
       severity.set("mild");
     }}>Enter</button>
   </div>
+
 </div>
 
-<h2><u>Allergen List:</u></h2>
+<div><h2><u>Allergen List:</u></h2>
+</div>
 
 <ul>
   {#each $allergens as item, index}
@@ -81,12 +82,32 @@
     display: flex;
     align-items: flex-end;
     gap: 10px;
-    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 10px;
   }
 
   .form-field {
     display: flex;
     flex-direction: column;
+  }
+    .input-field {
+    flex: 2 1 0;
+    min-width: 0;
+  }
+
+  .select-field {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .button-field {
+    flex: 0 0 auto;
+  }
+    input[type="text"], select {
+    width: 100%;
+    box-sizing: border-box;
   }
   
   /* Subheading styling */
@@ -96,7 +117,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     font-size: 20px;
-  }
+    margin: 10px;}
   
   /* Button styling */
   button {

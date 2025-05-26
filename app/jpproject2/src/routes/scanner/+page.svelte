@@ -1,6 +1,5 @@
 <!-- //CANERA SCANNER PAGE// -->
 <script lang="ts">
-  import { toSend } from "../../functions/functions";
   import { dev } from "$app/environment";
   import BottomNavigation from "../../components/BottomNavigation.svelte";
   import TopBanner from "../../components/TopBanner.svelte";
@@ -9,17 +8,26 @@
 
 </script>
 
-<TopBanner />
+<div class="scanner-page">
+  <TopBanner />
+  <div class="scanner-content">
+    <CameraScanner />
+  </div>
+  <BottomNavigation />
+</div>
 
-<!-- loader: -->
-
-      <CameraScanner />
-
-
-    <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
-
-
-
-
-<BottomNavigation />
+<style>
+  .scanner-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .scanner-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Optionally add: justify-content: center; align-items: center; */
+  }
+</style>
 
