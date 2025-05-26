@@ -1,122 +1,11 @@
 <!-- //CANERA SCANNER PAGE// -->
 <script lang="ts">
-  import { Html5Qrcode } from "html5-qrcode"; // custom mode: no UI built for you, but more customizable.
-  import {
-    get_ingredients,
-    toSend,
-    matchingAllergens,
-  } from "../../functions/functions";
+  import { toSend } from "../../functions/functions";
   import { dev } from "$app/environment";
   import BottomNavigation from "../../components/BottomNavigation.svelte";
   import TopBanner from "../../components/TopBanner.svelte";
-
-  import { onMount, onDestroy } from 'svelte';
-
-  let isPageLoaded = false;
-
-	onMount(() => {
-		console.log('page loaded, initializing camera preview');
-    isPageLoaded = true; // Set the page as loaded
-    getCameraPreview(); // Call the function to start the camera preview when the component mounts
-	});
-
-  let html5QrcodeInstance: Html5Qrcode | null = null;
-
-  onDestroy(() => {
-  // Stop the camera when navigating away
-  if (html5QrcodeInstance) {
-    html5QrcodeInstance.stop().then(() => {
-      html5QrcodeInstance = null;
-      console.log('Camera stopped');
-    }).catch((err) => {
-      console.error('Failed to stop camera:', err);
-    });
-  }
-});
-
-  import ProductNotFoundToast from "../../components/ProductNotFoundToast.svelte";
-  import AllergensDetectedToast from "../../components/AllergensDetectedToast.svelte";
-  import NoAllergensDetectedToast from "../../components/NoAllergensDetectedToast.svelte";
-
-  let isCoolingDown: boolean = false;
-  let lastScanned: string | null = null;
-  let toast_ready: boolean = false; // Flag to control the toast display
-
- async function onScanSuccess(decodedText: string, decodedResult: object, scanner: Html5Qrcode) {
-     if (isCoolingDown && decodedText === lastScanned) return; // Ignore if still in cooldown
-
-    console.log(`Code matched = ${decodedText}`, decodedResult);
-    toSend.upc = decodedText; // save to global variable
-    lastScanned = decodedText; // save last scanned code
-
-    toast_ready = false; // Reset the toast flag
-    await get_ingredients()
-    toast_ready = true;
-
-    setTimeout(() => {
-      scanner.resume(); // resume scanning after 2 seconds
-      console.log("Camera resumed to scan again");
-    }, 2000);
-    }
-    // Activate cooldown
-    isCoolingDown = true;
-    setTimeout(() => {
-      isCoolingDown = false; // 2 second cooldown, but this delays receiving stuff from the server
-    }, 1500);
-  
-  function onScanFailure(error: any) {
-    // handle scan failure, usually better to ignore and keep scanning.
-    // for example:
-    console.warn(`Code scan error = ${error}`);
-  }
-
-
+  import CameraScanner from "../../components/CameraScanner.svelte";
   //--------------  custom mode scanner ---------------
-  const getCameraPreview = async () => {
-    console.log("Starting camera preview...");
-    var cameraID;
-    
-    //get camera
-    Html5Qrcode.getCameras()         //should trigger permissions prompt
-      .then((devices) => {
-        if (devices && devices.length) {
-          cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
-          const html5QrcodeInstance = new Html5Qrcode("reader"); // create a new instance of the scanner with verbose logging if in dev mode
-          //start camera
-          // const html5Qrcode = new Html5Qrcode("reader"); //create a new instance of the scanner
-          const config = {
-            qrbox: { width: 275, height: 275 }, //TODO@akcrittenden make look nice
-            fps: 2, //SCANNING speed, not camera's displayed fps
-          }
-          html5QrcodeInstance.start(
-              {facingMode: "environment"}, //presumably will start using back camera
-              config,
-              (decodedText, decodedResult) => {
-                html5QrcodeInstance.pause(true)
-                console.log("QR code detected: ", decodedText);
-                onScanSuccess(decodedText, decodedResult, html5QrcodeInstance); 
-              //call the function to handle the scan result
-              },
-              (errorMessage) => {
-                //parse error
-                html5QrcodeInstance.resume(); // resume scanning after error
-                console.log("Error: ", errorMessage);
-              }
-            )
-            .catch((err) => {
-              console.error("Starting camera failed: ", err); //start failed, handle it.
-            });
-        } else {
-          console.error("No cameras found.");
-        }
-      })
-      .catch((err) => {
-        console.error("Error getting cameras: ", err);
-      });
-
-    //start reader
-  };
-
 
 </script>
 
@@ -125,25 +14,12 @@
 <!-- loader: -->
 
 <div>
-  <div id="reader" style="width: 400px;">
 
-    <div class="loader">  
-      <i class="fa-solid fa-gear"></i>
-    </div>
-  </div>
+  <CameraScanner />
+  
   <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
 
 </div>
 
-<!-- Triggers the toasts -->
-{#if toast_ready} <!-- Only shows toast after get_ingredients() is finished -->
-  {#if matchingAllergens[0] == '0'}
-    <NoAllergensDetectedToast />
-  {:else if matchingAllergens[0] == '1'}
-    <ProductNotFoundToast />
-  {:else if matchingAllergens[0] == 'z'}
-    <AllergensDetectedToast />
-  {/if}
-{/if}
 
 <BottomNavigation />
