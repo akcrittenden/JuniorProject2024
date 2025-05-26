@@ -9,6 +9,7 @@
   import AllergensDetectedToast from "./AllergensDetectedToast.svelte";
   import NoAllergensDetectedToast from "./NoAllergensDetectedToast.svelte";
   import ProductNotFoundToast from "./ProductNotFoundToast.svelte";
+  import { TextSizeOutline } from "flowbite-svelte-icons";
 
   let isPageLoaded = false;
   let html5QrcodeInstance: Html5Qrcode | null = null;
@@ -16,6 +17,7 @@
   let isCoolingDown: boolean = false;
   let lastScanned: string | null = null;
   let toast_ready: boolean = false; // Flag to control the toast display
+
   onMount(() => {
     console.log("page loaded, initializing camera preview");
     isPageLoaded = true; // Set the page as loaded
@@ -75,7 +77,7 @@
   }
 
   let facingMode: "environment" | "user" = "environment"; // default to back camera
-  
+
   const getCameraPreview = async () => {
     console.log("Starting camera preview...");
     var cameraID;
@@ -84,12 +86,14 @@
       .then((devices) => {
         if (devices && devices.length) {
           cameraID = devices[1]?.id || devices[0].id; // fallback to the first camera if the second is unavailable
-          const html5QrcodeInstance = new Html5Qrcode("reader"); // create a new instance of the scanner with verbose logging if in dev mode
+          const html5QrcodeInstance = new Html5Qrcode("scanner"); // create a new instance of the scanner with verbose logging if in dev mode
           //start camera
-          const config = {
-            qrbox: { width: 275, height: 275 }, //TODO@akcrittenden make look nice
-            fps: 2, //SCANNING speed, not camera's displayed fps
+          const config = { 
+            qrbox: { width: 250, height: 250 }, // size of the scanning box
+            fps: 3, //SCANNING speed, not camera's displayed fps
+            aspectRatio: 1.0
           };
+          console.log("Got scanner size: ", config.qrbox)
           html5QrcodeInstance
             .start(
               { facingMode },
@@ -121,17 +125,9 @@
   };
 </script>
 
-<div>
-  <div id="reader" style="width: 400px"></div>
+<div class="scanner-container">
+    <div id="scanner" class="scanner"></div>
 </div>
-
-<button
-  on:click={switchCamera}
-  aria-label="Switch Camera"
-  style="position:absolute; top:10px; right:10px; z-index:10;"
->
-  <i class="fa-solid fa-camera-rotate"></i>
-</button>
 
 <!-- Triggers the toasts -->
 {#if toast_ready}
@@ -144,3 +140,20 @@
     <AllergensDetectedToast />
   {/if}
 {/if}
+
+<style>
+    .scanner-container {
+        display: grid;
+        place-items: center;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .scanner {
+        width: 100%;
+        height: 100%;
+        max-width: 300px; /* Limit the maximum width */
+        max-height: 300px; /* Limit the maximum height */
+    }
+
+</style>

@@ -13,13 +13,13 @@
 
 <!-- loader: -->
 
-<div>
+      <CameraScanner />
 
-  <CameraScanner />
-  
-  <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
 
-</div>
+    <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
+
+
 
 
 <BottomNavigation />
+
