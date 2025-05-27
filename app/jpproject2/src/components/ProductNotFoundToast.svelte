@@ -6,5 +6,5 @@
 
 <Alert color="yellow" dismissable>
     <InfoCircleSolid slot="icon" class="w-5 h-5" />
-    Product Not Found. Please read ingredients.
+    <b>Product Not Found. Please read ingredients.</b>
 </Alert>

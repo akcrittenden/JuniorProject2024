@@ -6,5 +6,5 @@
 
 <Alert color="green" dismissable>
     <CheckOutline slot="icon" class="w-5 h-5" />
-    No allergen(s) detected in product.
+    <b>No Allergens Detected!</b>
 </Alert>
