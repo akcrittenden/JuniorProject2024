@@ -85,7 +85,6 @@
     width: 100%;
     max-width: 700px;
     margin: 0 auto;
-    padding: 10px;
   }
 
   .form-field {
@@ -100,6 +99,7 @@
   .select-field {
     flex: 1 1 0;
     min-width: 0;
+    font-size: 1rem;
   }
 
   .button-field {

@@ -1,5 +1,5 @@
 <!-- Our main navigation component -->
-
+<!-- TODO: add padding on top of navigation bar, center the icons, make them squish together or apart -->
 <script>
   import { BottomNav, BottomNavItem } from "flowbite-svelte";
   import {

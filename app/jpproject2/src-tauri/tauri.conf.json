@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "jpproject2",
-        "width": 800,
-        "height": 600
+        "title": "FoodLens",
+        "width": 400,
+        "height": 780
       }
     ],
     "security": {

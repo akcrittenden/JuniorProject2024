@@ -2,6 +2,9 @@
 <script>
     import { Alert } from 'flowbite-svelte'
     import { CloseOutline } from 'flowbite-svelte-icons';
+    import { vibrate } from "@tauri-apps/plugin-haptics"
+  import { onMount } from 'svelte';
+
 </script>
 
 <Alert color="red" dismissable>

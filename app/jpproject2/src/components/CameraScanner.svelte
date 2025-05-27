@@ -9,7 +9,6 @@
   import AllergensDetectedToast from "./AllergensDetectedToast.svelte";
   import NoAllergensDetectedToast from "./NoAllergensDetectedToast.svelte";
   import ProductNotFoundToast from "./ProductNotFoundToast.svelte";
-  import { TextSizeOutline } from "flowbite-svelte-icons";
 
   let isPageLoaded = false;
   let html5QrcodeInstance: Html5Qrcode | null;
@@ -100,7 +99,7 @@
               (decodedText, decodedResult) => {
                 html5QrcodeInstance?.pause(true);
                 console.log("QR code detected: ", decodedText);
-                onScanSuccess(decodedText, decodedResult, html5QrcodeInstance);
+                onScanSuccess(decodedText, decodedResult, html5QrcodeInstance!);
                 //call the function to handle the scan result
               },
               (errorMessage) => {
@@ -124,13 +123,9 @@
   };
 </script>
 
-<div class="scanner-container">
-    <div id="scanner" class="scanner"></div>
-        <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
-
-</div>
 
 <!-- Triggers the toasts -->
+<div class="fixed top-15 left-0 w-full bg-white shadow z-50">
 {#if toast_ready}
   <!-- Only shows toast after get_ingredients() is finished -->
   {#if matchingAllergens[0] == "0"}
@@ -141,6 +136,15 @@
     <AllergensDetectedToast />
   {/if}
 {/if}
+</div>
+<div class="scanner-container">
+    <div id="scanner" class="scanner"></div>
+        <p>Scan Result: {toSend.upc ? toSend.upc : "Waiting..."}</p>
+
+</div>
+
+<!-- Triggers the toasts -->
+
 
 <style>
     .scanner-container {

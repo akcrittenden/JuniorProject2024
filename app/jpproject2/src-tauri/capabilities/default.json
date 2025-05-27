@@ -10,6 +10,10 @@
     "shell:allow-open",
     "websocket:default",
     "sql:default",
-    "sql:allow-execute"
+    "sql:allow-execute",
+    "haptics:allow-impact-feedback",
+    "haptics:allow-notification-feedback",
+    "haptics:allow-selection-feedback",
+    "haptics:allow-vibrate"
   ]
 }
