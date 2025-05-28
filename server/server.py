@@ -143,38 +143,57 @@ async def websocket_handler(websocket):
             print(f"{get_timestamp()} - UPC {upc} not found in {db_filename}. Fetching from USDA...")
 
             # Fetch data from USDA if not found
-            food_data = await fetch_from_usda(upc)
+            product = await fetch_from_usda(upc)
 
-            if food_data and "foods" in food_data and len(food_data["foods"]) > 0:
-                food = food_data["foods"][0]
+            if product and "foods" in product and len(product["foods"]) > 0:
+                food = product["foods"][0]
                 description = food.get("description", "No description found")
                 brand_name = food.get("brandName", "No brand name found")
                 ingredients = food.get("ingredients", "No ingredients found")
-                product = {"upc_code": upc, "brand_name": brand_name, "description": description, "ingredients": ingredients}
-                
+                product = {"upc_code": upc, "brand_name": brand_name, "description": description,
+                           "ingredients": ingredients}
+
                 # Store fetched data in database
                 add_to_db(upc, brand_name, description, ingredients)
-
-
             else:
+                print(f"{get_timestamp()} - Product not found")
                 await websocket.send(json.dumps({"error": "Product not found"}))
                 return
 
-        # Parse ingredients into a list and compare allergens
-        ingredients_list = [ingredient.strip().lower() for ingredient in product["ingredients"].split(",")]
-        matches = [allergen for allergen in allergens if allergen.lower() in ingredients_list]
+        # Lowercase and split ingredient string by commas
+        raw_ingredients = product["ingredients"].lower()
+        ingredient_phrases = [ingredient.strip() for ingredient in raw_ingredients.split(",") if ingredient.strip()]
+
+        # Tokenize each phrase into a tuple of words
+        tokenized_ingredients = [tuple(phrase.split()) for phrase in ingredient_phrases]
+
+        # Pair each tokenized tuple with its original phrase
+        ingredient_map = list(zip(tokenized_ingredients, ingredient_phrases))
+
+        # Normalize allergen input
+        allergens_lower = [a.lower() for a in allergens]
+
+        # Store original ingredient phrases that contain any allergen
+        # Match if full allergen string is in the phrase or as a token group
+        matches = []
+        for tokens, original_phrase in ingredient_map:
+            phrase_text = ' '.join(tokens)
+            for allergen in allergens_lower:
+                if allergen in phrase_text:
+                    matches.append(original_phrase)
+                    break  # Avoid duplicate entries
 
         # Check if any matches were found
         if not matches:
-                # Send no matches found
-                print(f"{get_timestamp()} - Matching Allergens Found: None")
-                await websocket.send("None")
+            # Send no matches found
+            print(f"{get_timestamp()} - Matching Allergens Found: None")
+            await websocket.send("None")
         else:
-             # Send list of matches to the client
+            # Send list of matches to the client
             print(f"{get_timestamp()} - Matching Allergens Found: {matches}")
-            await websocket.send(matches)   # TO DO: Can we make this send an object with the Brand Name and
-                                            # description so we can display them in the UI? (After JP
-                                            # Presentation) - Amanda
+            await websocket.send(matches)  # TO DO: Can we make this send an object with the Brand Name and
+            # description so we can display them in the UI? (After JP
+            # Presentation) - Amanda
 
     except Exception as e:
         print(f"{get_timestamp()} - Error: {e}")
@@ -207,7 +226,7 @@ async def main():
     initialize_database()
 
     # Start WebSocket server
-    print(f"{get_timestamp()} - Starting server on foodlens .tplinkdns.com:{port}")
+    print(f"{get_timestamp()} - Starting server on foodlens.tplinkdns.com:{port}")
     async with websockets.serve(websocket_handler, host, port):
         await asyncio.gather(periodic_message())
         await asyncio.Future()  # Run forever
