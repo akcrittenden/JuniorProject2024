@@ -13,6 +13,7 @@ export var toSend: {
 };
 
 export var matchingAllergens: string[] = [];
+export let detectedMessage = "";
 
 async function getAllergens() {
     let allergensList = get(allergens);
@@ -58,6 +59,7 @@ export async function get_ingredients(){
       else { // if allergens found, push z
         matchingAllergens.push('z');
         console.log("Allergens detected");
+        detectedMessage = stringResult; // save the detected message
       }
       resolve(matchingAllergens); // resolves the promise with the allergens
     });

@@ -10,6 +10,7 @@
   import NoAllergensDetectedToast from "./NoAllergensDetectedToast.svelte";
   import ProductNotFoundToast from "./ProductNotFoundToast.svelte";
 
+  import { detectedMessage } from "../functions/functions";
   let isPageLoaded = false;
   let html5QrcodeInstance: Html5Qrcode | null;
 
@@ -133,7 +134,7 @@
   {:else if matchingAllergens[0] == "1"}
     <ProductNotFoundToast />
   {:else if matchingAllergens[0] == "z"}
-    <AllergensDetectedToast />
+    <AllergensDetectedToast message={detectedMessage} />
   {/if}
 {/if}
 </div>
