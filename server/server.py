@@ -49,7 +49,7 @@ def fetch_from_db(upc_code):
 
     if product:
         return {
-            "brand_name": product[1],
+            "brand_name":  product[1],
             "description": product[2],
             "ingredients": product[3]
         }
@@ -156,48 +156,64 @@ async def websocket_handler(websocket):
                 # Store fetched data in database
                 add_to_db(upc, brand_name, description, ingredients)
             else:
-                print(f"{get_timestamp()} - Product not found")
                 await websocket.send(json.dumps({"error": "Product not found"}))
+                print(f"{get_timestamp()} - Product not found")
+                format_fun()
                 return
 
-        # Lowercase and split ingredient string by commas
+        # Print product info
+        print(f"{get_timestamp()} - Brand: {product.get('brand_name', 'No brand name found')}")
+        print(f"{get_timestamp()} - Description: {product.get('description', 'No description found')}")
+
+        # Lowercase and split ingredient string
         raw_ingredients = product["ingredients"].lower()
         ingredient_phrases = [ingredient.strip() for ingredient in raw_ingredients.split(",") if ingredient.strip()]
 
-        # Tokenize each phrase into a tuple of words
-        tokenized_ingredients = [tuple(phrase.split()) for phrase in ingredient_phrases]
+        # Tokenize each phrase into list of words
+        tokenized_ingredients = [phrase.split() for phrase in ingredient_phrases]
 
-        # Pair each tokenized tuple with its original phrase
+        # Pair token lists with their original phrases
         ingredient_map = list(zip(tokenized_ingredients, ingredient_phrases))
 
-        # Normalize allergen input
-        allergens_lower = [a.lower() for a in allergens]
+        # Normalize allergen input and tokenize each allergen
+        allergen_tokens = [a.lower().split() for a in allergens]
 
-        # Store original ingredient phrases that contain any allergen
-        # Match if full allergen string is in the phrase or as a token group
         matches = []
         for tokens, original_phrase in ingredient_map:
-            phrase_text = ' '.join(tokens)
-            for allergen in allergens_lower:
-                if allergen in phrase_text:
-                    matches.append(original_phrase)
-                    break  # Avoid duplicate entries
+            for allergen in allergen_tokens:
+                if len(allergen) == 1:
+                    # Single-word allergen must appear as a full word
+                    if allergen[0] in tokens:
+                        matches.append(original_phrase)
+                        break
+                else:
+                    # Multi-word allergen must match as an exact sequence
+                    for i in range(len(tokens) - len(allergen) + 1):
+                        if tokens[i:i + len(allergen)] == allergen:
+                            matches.append(original_phrase)
+                            break
+                    else:
+                        continue  # Continue outer loop if no break
+                    break  # Exit outer loop on match
 
         # Check if any matches were found
         if not matches:
             # Send no matches found
-            print(f"{get_timestamp()} - Matching Allergens Found: None")
             await websocket.send("None")
+            print(f"{get_timestamp()} - Matching Allergens Found: None")
+            format_fun()
         else:
             # Send list of matches to the client
+            await websocket.send(matches)
             print(f"{get_timestamp()} - Matching Allergens Found: {matches}")
-            await websocket.send(matches)  # TO DO: Can we make this send an object with the Brand Name and
+            format_fun()
+            # TO DO: Can we make this send an object with the Brand Name and
             # description so we can display them in the UI? (After JP
             # Presentation) - Amanda
 
     except Exception as e:
-        print(f"{get_timestamp()} - Error: {e}")
         await websocket.send(json.dumps({"error": "Server error"}))
+        print(f"{get_timestamp()} - Error: {e}")
 
 
 # Formatted timestamp
@@ -216,6 +232,7 @@ async def periodic_message():
 # Print a line of dashes for formatting
 def format_fun():
     print("-" * 100)
+    # In honor of Professor Manish Arora
 
 
 async def main():
