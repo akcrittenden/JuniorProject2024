@@ -30,18 +30,21 @@
 
 <div class="form-row h-60 flex items-center space-x-4">
   <!-- UPC input -->
-  <div class="form-field input-field flex-1">
+  
+  <div class="form-field input-field flex-1 pl-3">
+      <div class="mb-1 text-sm text-gray-700">Enter UPC Code</div>
     <Input type="text" bind:value={toSend.upc} />
   </div>
 
   <!-- Enter button -->
-  <div class="form-field button-field">
+  <div class="form-field button-field mt-6 pr-3">
     <Button
       size="sm"
       class="bg-green-500 hover:bg-green-600 text-white"
-      on:click={() => {
+      on:click={async () => {
+        toast_ready = false;
+        await get_ingredients();
         toast_ready = true;
-        get_ingredients();
       }}
     >
       Enter
