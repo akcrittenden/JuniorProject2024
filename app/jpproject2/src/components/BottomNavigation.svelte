@@ -16,20 +16,28 @@
 
 <BottomNav
   {activeUrl}
-  position="absolute"
-  innerClass="grid-cols-4"
+  position="fixed"
+  class="bottom-nav bottom-0 left-0 w-full"
+  innerClass="grid grid-cols-4"
   activeClass="font-bold text-green-500"
 >
   <BottomNavItem btnName="Home" href="/">
-    <HomeSolid />
+    <HomeSolid class="w-8 h-8"/>
   </BottomNavItem>
   <BottomNavItem btnName="Allergens" href="/dietary-profile">
-    <SeedlingSolid />
+    <SeedlingSolid class="w-8 h-8"/>
   </BottomNavItem>
   <BottomNavItem btnName="Scanner" href="/scanner">
-    <EyeSolid />
+    <EyeSolid class="w-8 h-8"/>
   </BottomNavItem>
   <BottomNavItem btnName="Manual" href="/scan">
-    <PenSolid />
+    <PenSolid class="w-8 h-8"/>
   </BottomNavItem>
 </BottomNav>
+
+
+<style>
+  :global(.bottom-nav) {
+    padding-top: 5rem;
+  }
+</style>
